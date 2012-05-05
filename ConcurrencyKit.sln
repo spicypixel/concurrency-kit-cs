@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Threading", "System.Threading\System.Threading.csproj", "{4BCD180B-75CB-4C94-813D-B1459183BBA5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpicyPixel.Threading.Unity", "SpicyPixel.Threading.Unity\SpicyPixel.Threading.Unity.csproj", "{9878C737-6752-41FA-A1CC-347E9D27C2D6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpicyPixel.Threading", "SpicyPixel.Threading\SpicyPixel.Threading.csproj", "{26BB10D1-B769-42A2-A3A3-E2569F7DB808}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpicyPixel.Threading.Unity.Test", "SpicyPixel.Threading.Unity.Test\SpicyPixel.Threading.Unity.Test.csproj", "{25A4F03F-0C3F-4952-B5A0-37BC0E77873F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpicyPixel.Threading.Test", "SpicyPixel.Threading.Test\SpicyPixel.Threading.Test.csproj", "{2E8090B3-F4EE-4998-9DCD-07BA16E8D93B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{25A4F03F-0C3F-4952-B5A0-37BC0E77873F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25A4F03F-0C3F-4952-B5A0-37BC0E77873F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25A4F03F-0C3F-4952-B5A0-37BC0E77873F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25A4F03F-0C3F-4952-B5A0-37BC0E77873F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26BB10D1-B769-42A2-A3A3-E2569F7DB808}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26BB10D1-B769-42A2-A3A3-E2569F7DB808}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26BB10D1-B769-42A2-A3A3-E2569F7DB808}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26BB10D1-B769-42A2-A3A3-E2569F7DB808}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E8090B3-F4EE-4998-9DCD-07BA16E8D93B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E8090B3-F4EE-4998-9DCD-07BA16E8D93B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E8090B3-F4EE-4998-9DCD-07BA16E8D93B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E8090B3-F4EE-4998-9DCD-07BA16E8D93B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4BCD180B-75CB-4C94-813D-B1459183BBA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4BCD180B-75CB-4C94-813D-B1459183BBA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4BCD180B-75CB-4C94-813D-B1459183BBA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4BCD180B-75CB-4C94-813D-B1459183BBA5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9878C737-6752-41FA-A1CC-347E9D27C2D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9878C737-6752-41FA-A1CC-347E9D27C2D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9878C737-6752-41FA-A1CC-347E9D27C2D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9878C737-6752-41FA-A1CC-347E9D27C2D6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = SpicyPixel.Threading.Unity.Test\SpicyPixel.Threading.Unity.Test.csproj
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{26BB10D1-B769-42A2-A3A3-E2569F7DB808}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>SpicyPixel.Threading</RootNamespace>
+    <AssemblyName>SpicyPixel.Threading</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>True</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>False</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>False</ConsolePause>
+    <GenerateDocumentation>True</GenerateDocumentation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>False</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>False</ConsolePause>
+    <GenerateDocumentation>True</GenerateDocumentation>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="FiberInstruction.cs" />
+    <Compile Include="FiberTaskScheduler.cs" />
+    <Compile Include="Fiber.cs" />
+    <Compile Include="FiberState.cs" />
+    <Compile Include="IFiberScheduler.cs" />
+    <Compile Include="SystemFiberScheduler.cs" />
+    <Compile Include="FiberScheduler.cs" />
+    <Compile Include="FiberAbortException.cs" />
+    <Compile Include="StopInstruction.cs" />
+    <Compile Include="YieldToAnyFiber.cs" />
+    <Compile Include="YieldToFiber.cs" />
+    <Compile Include="YieldUntilComplete.cs" />
+    <Compile Include="YieldForSeconds.cs" />
+    <Compile Include="FiberSchedulerSynchronizationContext.cs" />
+    <Compile Include="YieldableTask.cs" />
+    <Compile Include="ObjectInstruction.cs" />
+    <Compile Include="FiberTaskExtensions.cs" />
+    <Compile Include="SystemCoroutine.cs" />
+    <Compile Include="FiberUnhandledExceptionEventArgs.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\System.Threading\System.Threading.csproj">
+      <Project>{4BCD180B-75CB-4C94-813D-B1459183BBA5}</Project>
+      <Name>System.Threading</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>

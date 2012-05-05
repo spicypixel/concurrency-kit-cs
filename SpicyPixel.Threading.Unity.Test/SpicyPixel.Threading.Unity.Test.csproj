@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{25A4F03F-0C3F-4952-B5A0-37BC0E77873F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>SpicyPixel.Threading.Unity.Test</RootNamespace>
+    <AssemblyName>SpicyPixel.Threading.Unity.Test</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\..\..\..\..\..\Applications\Unity\Unity.app\Contents\Frameworks\Managed\UnityEngine.dll</HintPath>
+      <Package>/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEngine.dll</Package>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="ConcurrencyKitUnityTestSuite.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\SpicyPixel.Threading\SpicyPixel.Threading.csproj">
+      <Project>{26BB10D1-B769-42A2-A3A3-E2569F7DB808}</Project>
+      <Name>SpicyPixel.Threading</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SpicyPixel.Threading.Unity\SpicyPixel.Threading.Unity.csproj">
+      <Project>{9878C737-6752-41FA-A1CC-347E9D27C2D6}</Project>
+      <Name>SpicyPixel.Threading.Unity</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\System.Threading\System.Threading.csproj">
+      <Project>{4BCD180B-75CB-4C94-813D-B1459183BBA5}</Project>
+      <Name>System.Threading</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>
