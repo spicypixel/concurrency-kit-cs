@@ -46,7 +46,7 @@ namespace System.Threading
 			int newTemp = newVal ? Set : UnSet;
 			int expectedTemp = expected ? Set : UnSet;
 
-			return Interlocked.CompareExchange (ref flag, newTemp, expectedTemp) == expectedTemp;
+			return AotInterlocked.CompareExchange (ref flag, newTemp, expectedTemp) == expectedTemp;
 		}
 
 		public static AtomicBooleanValue FromValue (bool value)
@@ -70,7 +70,7 @@ namespace System.Threading
 		public bool Exchange (bool newVal)
 		{
 			int newTemp = newVal ? Set : UnSet;
-			return Interlocked.Exchange (ref flag, newTemp) == Set;
+			return AotInterlocked.Exchange (ref flag, newTemp) == Set;
 		}
 
 		public bool Value {
@@ -122,7 +122,7 @@ namespace System.Threading
 			int newTemp = newVal ? Set : UnSet;
 			int expectedTemp = expected ? Set : UnSet;
 
-			return Interlocked.CompareExchange (ref flag, newTemp, expectedTemp) == expectedTemp;
+			return AotInterlocked.CompareExchange (ref flag, newTemp, expectedTemp) == expectedTemp;
 		}
 
 		public static AtomicBoolean FromValue (bool value)
@@ -146,7 +146,7 @@ namespace System.Threading
 		public bool Exchange (bool newVal)
 		{
 			int newTemp = newVal ? Set : UnSet;
-			return Interlocked.Exchange (ref flag, newTemp) == Set;
+			return AotInterlocked.Exchange (ref flag, newTemp) == Set;
 		}
 
 		public bool Value {
