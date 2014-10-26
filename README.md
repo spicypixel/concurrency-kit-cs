@@ -1,6 +1,8 @@
 Spicy Pixel Concurrency Kit
 ===========================
-[Get it now in the Unity Asset Store!](http://u3d.as/content/spicy-pixel/spicy-pixel-concurrency-kit)
+[Download it now in the Unity Asset Store](http://u3d.as/content/spicy-pixel/spicy-pixel-concurrency-kit)
+
+[Get the Source Code on GitHub](https://github.com/spicypixel/concurrency-kit)
 
 The Concurrency Kit is a .NET/Mono kit that includes a port of the [Task Parallel Library](http://msdn.microsoft.com/en-us/library/dd460717.aspx) and extends it to support [Fibers](http://en.wikipedia.org/wiki/Fiber_(computer_science)), [Coroutines](http://en.wikipedia.org/wiki/Coroutine), and [Unity](http://unity3d.com/). Fibers allow code paths to execute concurrently using a single thread by leveraging the co-operative yielding behavior of coroutines.
 
