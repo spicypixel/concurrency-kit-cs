@@ -30,13 +30,16 @@ namespace System.Threading
 {
 	internal struct Watch
 	{
+		// Do not rely on Mono internals
+		#if false
 		static readonly MethodInfo GetTimeMonotonicMethodInfo = 
 			typeof(DateTime).GetMethod("GetTimeMonotonic", BindingFlags.NonPublic | BindingFlags.Static);
 
 		// Spicy Pixel: This appears to work on AOT too and is much faster than dynamic invoke.
 		static readonly Func<long> GetTimeMonotonic = (Func<long>)Delegate.CreateDelegate(
 			typeof(Func<long>), GetTimeMonotonicMethodInfo);
-
+		#endif
+		
 		long startTicks;
 		
 		public static Watch StartNew ()
@@ -71,8 +74,8 @@ namespace System.Threading
 			// time updates (which DateTime.Now.Ticks does not).
 			// 
 			// return DateTime.GetTimeMonotonic ();
-			// return DateTime.Now.Ticks; 
-			return Watch.GetTimeMonotonic();
+			return DateTime.Now.Ticks;
+			// return Watch.GetTimeMonotonic();
 		}
 	}
 }
