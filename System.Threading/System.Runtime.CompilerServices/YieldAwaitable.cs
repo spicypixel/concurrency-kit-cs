@@ -70,7 +70,8 @@ namespace System.Runtime.CompilerServices
 					// Pass the continuation as an argument to avoid allocating
 					// hoisting class
 					//
-					ThreadPool.UnsafeQueueUserWorkItem (l => ((Action) l) (), continuation);
+					//ThreadPool.UnsafeQueueUserWorkItem (l => ((Action) l) (), continuation);
+					ThreadPool.QueueUserWorkItem (l => ((Action) l) (), continuation);
 				} else {
 					new Task (continuation).Start (TaskScheduler.Current);
 				}

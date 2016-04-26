@@ -54,8 +54,10 @@ namespace System.Threading.Tasks
 			// The main difference is that the callstack is not propagated with the
 			// unsafe method which allows for elevated security in the queued task
 			// (which is desirable here).
-			ThreadPool.UnsafeQueueUserWorkItem (callback, task);
-			// ThreadPool.QueueUserWorkItem (callback, task);
+			//
+			// Switching back to QueueUserWorkItem as it works with 2.0 subset.
+			// ThreadPool.UnsafeQueueUserWorkItem (callback, task);
+			ThreadPool.QueueUserWorkItem (callback, task);
 		}
 
 		static void TaskExecuterCallback (object obj)
