@@ -338,7 +338,7 @@ namespace SpicyPixel.Threading
 		/// </summary>
 		/// <remarks>
 		/// This method is useful when updating the scheduler manually
-		/// with a custom run loop instead of calling <see cref="Run()"/>.
+		/// with a custom run loop instead of calling <see cref="Run(Fiber, CancellationToken, float)"/>.
 		/// </remarks>
 		/// <param name='time'>
 		/// Time in seconds since the scheduler or application began running.
@@ -699,7 +699,7 @@ namespace SpicyPixel.Threading
 				// therefore after Dispose(). Would probably need a lock.
 				
 				// Watch for completion
-				EventHandler<EventArgs> completed;
+				EventHandler<EventArgs> completed = null;
 				completed = (sender, e) => 
 				{
 					var originalCompleteOnce = Interlocked.CompareExchange(ref completeOnce, 1, 0);

@@ -42,7 +42,7 @@ namespace SpicyPixel.Threading.Tasks
 	{
 		Fiber fiber;
 		Exception fiberException;
-		
+
 		internal Fiber Fiber {
 			get { return fiber; }
 		}
@@ -51,7 +51,7 @@ namespace SpicyPixel.Threading.Tasks
 			get { return fiberException; }
 			set { fiberException = value; }
 		}
-		
+
         /// <summary>
         /// Initializes a new instance of the <see cref="SpicyPixel.Threading.Tasks.YieldableTask"/> class.
         /// </summary>
@@ -61,10 +61,11 @@ namespace SpicyPixel.Threading.Tasks
         /// <param name='coroutine'>
         /// The coroutine to execute.
         /// </param>
-		public YieldableTask (IEnumerator coroutine) : 
-			base(() => InternalAction())
+		public YieldableTask (IEnumerator coroutine) :
+			base(() => {})
 		{
 			fiber = new Fiber(coroutine);
+			SetAction(() => InternalAction ());
 		}
 		
         /// <summary>
@@ -79,10 +80,11 @@ namespace SpicyPixel.Threading.Tasks
         /// <param name='creationOptions'>
         /// Creation options.
         /// </param>
-		public YieldableTask (IEnumerator coroutine, TaskCreationOptions creationOptions) : 
-			base(() => InternalAction(), creationOptions)
+		public YieldableTask (IEnumerator coroutine, TaskCreationOptions creationOptions) :
+			base(() => {}, creationOptions)
 		{
 			fiber = new Fiber(coroutine);
+			SetAction(() => InternalAction ());
 		}
 		
         /// <summary>
@@ -97,10 +99,11 @@ namespace SpicyPixel.Threading.Tasks
         /// <param name='cancellationToken'>
         /// Cancellation token.
         /// </param>
-		public YieldableTask (IEnumerator coroutine, CancellationToken cancellationToken) : 
-			base(() => InternalAction(), cancellationToken)
+		public YieldableTask (IEnumerator coroutine, CancellationToken cancellationToken) :
+			base(() => {}, cancellationToken)
 		{
 			fiber = new Fiber(coroutine);
+			SetAction(() => InternalAction ());
 		}
 		
         /// <summary>
@@ -119,9 +122,10 @@ namespace SpicyPixel.Threading.Tasks
         /// Creation options.
         /// </param>
 		public YieldableTask (IEnumerator coroutine, CancellationToken cancellationToken, TaskCreationOptions creationOptions) : 
-			base(() => InternalAction(), cancellationToken, creationOptions)
+			base(() => {}, cancellationToken, creationOptions)
 		{
 			fiber = new Fiber(coroutine);
+			SetAction(() => InternalAction ());
 		}
 		
 		/// <summary>
@@ -134,9 +138,10 @@ namespace SpicyPixel.Threading.Tasks
         /// The coroutine to execute.
         /// </param>
 		public YieldableTask (FiberInstruction instruction) : 
-			base(() => InternalAction())
+			base(() => {})
 		{
 			fiber = new Fiber(() => instruction);
+			SetAction(() => InternalAction ());
 		}
 		
         /// <summary>
@@ -152,9 +157,10 @@ namespace SpicyPixel.Threading.Tasks
         /// Creation options.
         /// </param>
 		public YieldableTask (FiberInstruction instruction, TaskCreationOptions creationOptions) : 
-			base(() => InternalAction(), creationOptions)
+			base(() => {}, creationOptions)
 		{
 			fiber = new Fiber(() => instruction);
+			SetAction(() => InternalAction ());
 		}
 		
         /// <summary>
@@ -170,9 +176,10 @@ namespace SpicyPixel.Threading.Tasks
         /// Cancellation token.
         /// </param>
 		public YieldableTask (FiberInstruction instruction, CancellationToken cancellationToken) : 
-			base(() => InternalAction(), cancellationToken)
+			base(() => {}, cancellationToken)
 		{
 			fiber = new Fiber(() => instruction);
+			SetAction(() => InternalAction ());
 		}
 		
         /// <summary>
@@ -191,9 +198,10 @@ namespace SpicyPixel.Threading.Tasks
         /// Creation options.
         /// </param>
 		public YieldableTask (FiberInstruction instruction, CancellationToken cancellationToken, TaskCreationOptions creationOptions) : 
-			base(() => InternalAction(), cancellationToken, creationOptions)
+			base(() => {}, cancellationToken, creationOptions)
 		{
 			fiber = new Fiber(() => instruction);
+			SetAction(() => InternalAction ());
 		}
 		
 		/// <summary>
@@ -206,9 +214,10 @@ namespace SpicyPixel.Threading.Tasks
         /// The coroutine to execute.
         /// </param>
 		public YieldableTask (Func<FiberInstruction> coroutine) : 
-			base(() => InternalAction())
+			base(() => {})
 		{
 			fiber = new Fiber(coroutine);
+			SetAction(() => InternalAction ());
 		}
 		
         /// <summary>
@@ -224,9 +233,10 @@ namespace SpicyPixel.Threading.Tasks
         /// Creation options.
         /// </param>
 		public YieldableTask (Func<FiberInstruction> coroutine, TaskCreationOptions creationOptions) : 
-			base(() => InternalAction(), creationOptions)
+			base(() => {}, creationOptions)
 		{
 			fiber = new Fiber(coroutine);
+			SetAction(() => InternalAction ());
 		}
 		
         /// <summary>
@@ -242,9 +252,10 @@ namespace SpicyPixel.Threading.Tasks
         /// Cancellation token.
         /// </param>
 		public YieldableTask (Func<FiberInstruction> coroutine, CancellationToken cancellationToken) : 
-			base(() => InternalAction(), cancellationToken)
+			base(() => {}, cancellationToken)
 		{
 			fiber = new Fiber(coroutine);
+			SetAction(() => InternalAction ());
 		}
 		
         /// <summary>
@@ -263,9 +274,10 @@ namespace SpicyPixel.Threading.Tasks
         /// Creation options.
         /// </param>
 		public YieldableTask (Func<FiberInstruction> coroutine, CancellationToken cancellationToken, TaskCreationOptions creationOptions) : 
-			base(() => InternalAction(), cancellationToken, creationOptions)
+			base(() => {}, cancellationToken, creationOptions)
 		{
 			fiber = new Fiber(coroutine);
+			SetAction(() => InternalAction ());
 		}
 		
 		/// <summary>
@@ -281,9 +293,10 @@ namespace SpicyPixel.Threading.Tasks
 		/// State to pass to the function.
 		/// </param>
 		public YieldableTask (Func<object, FiberInstruction> coroutine, object state) : 
-			base(() => InternalAction())
+			base(() => {})
 		{
 			fiber = new Fiber(coroutine, state);
+			SetAction(() => InternalAction ());
 		}
 		
         /// <summary>
@@ -302,9 +315,10 @@ namespace SpicyPixel.Threading.Tasks
         /// Creation options.
         /// </param>
 		public YieldableTask (Func<object, FiberInstruction> coroutine, object state, TaskCreationOptions creationOptions) : 
-			base(() => InternalAction(), creationOptions)
+			base(() => {}, creationOptions)
 		{
 			fiber = new Fiber(coroutine, state);
+			SetAction(() => InternalAction ());
 		}
 		
         /// <summary>
@@ -323,9 +337,10 @@ namespace SpicyPixel.Threading.Tasks
         /// Cancellation token.
         /// </param>
 		public YieldableTask (Func<object, FiberInstruction> coroutine, object state, CancellationToken cancellationToken) : 
-			base(() => InternalAction(), cancellationToken)
+			base(() => {}, cancellationToken)
 		{
 			fiber = new Fiber(coroutine, state);
+			SetAction(() => InternalAction ());
 		}
 		
         /// <summary>
@@ -347,9 +362,10 @@ namespace SpicyPixel.Threading.Tasks
         /// Creation options.
         /// </param>
 		public YieldableTask (Func<object, FiberInstruction> coroutine, object state, CancellationToken cancellationToken, TaskCreationOptions creationOptions) : 
-			base(() => InternalAction(), cancellationToken, creationOptions)
+			base(() => {}, cancellationToken, creationOptions)
 		{
 			fiber = new Fiber(coroutine, state);
+			SetAction(() => InternalAction ());
 		}
 		
 		private void InternalAction()

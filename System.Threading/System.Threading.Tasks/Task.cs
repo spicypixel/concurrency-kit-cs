@@ -136,6 +136,18 @@ namespace System.Threading.Tasks
 				throw new ArgumentOutOfRangeException ("creationOptions");
 		}
 
+		// Spicy Pixel: Recent compiler changes do not allow delegates passed to base() to access 'this'.
+		// So we add protected members to update the task action later.
+		protected void SetAction (Action action)
+		{
+			this.invoker = TaskActionInvoker.Create(action);
+		}
+
+		protected void SetAction (Action<object> action)
+		{
+			this.invoker = TaskActionInvoker.Create(action);
+		}
+
 		internal Task (TaskActionInvoker invoker, object state, CancellationToken cancellationToken,
 		               TaskCreationOptions creationOptions, Task parent = null, Task contAncestor = null, bool ignoreCancellation = false)
 		{
