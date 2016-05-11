@@ -3,12 +3,12 @@ var gutil = require("gulp-util");
 var msbuild = require("gulp-msbuild");
 var nunit = require("gulp-nunit-runner");
 var del = require("del");
-var spawn = require('child_process').spawn;
+var spawn = require("child_process").spawn;
 var path = require("path");
 var pathExists = require("path-exists");
 
 // SKIP_INSTALL will be set during CI setup since `npm install` is run
-// to install dependencies. We don't need to run the build at that
+// to install dependencies. We don"t need to run the build at that
 // time because it will run again when the `ci` task is called.
 if(process.env.SKIP_INSTALL == 1 && process.argv[process.argv.length - 1] == "install") {
   gutil.log("SKIP_INSTALL was set, skipping install ...");
@@ -65,37 +65,39 @@ function buildCode() {
   });
 }
 
-// Build docs
-function buildDocs() {
+// Install node dependencies
+function installDoxygenTheme() {
   return new Promise((resolve, reject) => {
-    gutil.log(gutil.colors.cyan("Building docs ..."));
-    var doxygen = spawn('doxygen');
-    doxygen.stdout.setEncoding('utf8');
-    doxygen.stderr.setEncoding('utf8');
-    doxygen.stdout.on("data", data => gutil.log(data));
-    doxygen.stderr.on("data", data => gutil.colors.red(gutil.log(data)));
-    doxygen.on("exit", code => code == 0 ? resolve() : reject(code));    
+    gutil.log(gutil.colors.cyan("Installing doxygen theme ..."));
+    
+    var npm = spawn("npm", ["install"], 
+      {cwd: path.join(__dirname, "Doxygen", "theme", "bootstrap")});
+      
+    npm.stdout.setEncoding("utf8");
+    npm.stderr.setEncoding("utf8");
+    npm.stdout.on("data", data => gutil.log(data));
+    npm.stderr.on("data", data => gutil.colors.red(gutil.log(data)));
+    npm.on("exit", code => code == 0 ? resolve() : reject(code));
   });
 }
 
-// Build code and docs
-gulp.task("build", () => buildCode().then(() => buildDocs()));
+// Build docs
+function buildDocs() {
+  return installDoxygenTheme().then(() => {
+    return new Promise((resolve, reject) => {
+      gutil.log(gutil.colors.cyan("Building docs ..."));
+      var doxygen = spawn("doxygen");
+      doxygen.stdout.setEncoding("utf8");
+      doxygen.stderr.setEncoding("utf8");
+      doxygen.stdout.on("data", data => gutil.log(data));
+      doxygen.stderr.on("data", data => gutil.colors.red(gutil.log(data)));
+      doxygen.on("exit", code => code == 0 ? resolve() : reject(code));    
+    });
+  });
+}
 
-// Build docs with doxygen
-gulp.task("docs", () => buildDocs());
-
-// Test with NUnit
-gulp.task("test", ["build"], () => {
-  return gulp
-    .src(["**/bin/**/*Test.dll"], { read: false })
-    .pipe(nunit({
-      executable: "/usr/local/bin",
-      teamcity: false
-    }));
-});
-
-// Install the build into a Unity Assets folder if it exists
-gulp.task("install", ["build"], () => {
+function installToUnity() {
+    // Install the build into a Unity Assets folder if it exists  
   var assetsDir = path.join(__dirname, "..", "..", "Assets");
     
   return pathExists(assetsDir).then(exists => {
@@ -150,5 +152,26 @@ gulp.task("install", ["build"], () => {
     });
 
     return Promise.all (promises);
-  });  
-});
+  });
+}
+
+function test() {
+  return gulp
+    .src(["**/bin/**/*Test.dll"], { read: false })
+    .pipe(nunit({
+      executable: "/usr/local/bin",
+      teamcity: false
+    }));
+}
+
+// Build code and docs
+gulp.task("build", () => buildCode().then(() => buildDocs()));
+
+// Build docs with doxygen
+gulp.task("docs", () => buildDocs());
+
+// Test with NUnit
+gulp.task("test", () => build().then(() => test()));
+
+// Install
+gulp.task("install", () => build().then(() => installToUnity()));
