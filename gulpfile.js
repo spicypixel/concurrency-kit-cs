@@ -42,17 +42,11 @@ function buildCode() {
   var assetsDir = path.join(__dirname, "..", "..", "Assets");
   return pathExists(assetsDir).then(exists => {
     gutil.log("pathExists: ", assetsDir, " = ", exists);
-    return new Promise((resolve, reject) => {
-      var constants = [];
-      if (exists) {
-        constants.concat("UnityInterop");
-      }
-      
+    return new Promise((resolve, reject) => {      
       gulp
         .src("Source/**/*.sln")
         .pipe(msbuild({
             properties: {
-              Constants: constants,
               UnityEnginePath: "/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEngine.dll"
             },
             toolsVersion: 12.0,

@@ -16,7 +16,7 @@
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;NET_4_0;NET_4_5;$(Constants)</DefineConstants>
+    <DefineConstants>DEBUG;NET_4_0;NET_4_5</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>False</ConsolePause>
@@ -29,7 +29,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>False</ConsolePause>
-    <DefineConstants>NET_4_0;NET_4_5;$(Constants)</DefineConstants>
+    <DefineConstants>NET_4_0;NET_4_5</DefineConstants>
     <NoWarn>1591</NoWarn>
     <DocumentationFile>bin\Release\System.Threading.xml</DocumentationFile>
   </PropertyGroup>
