@@ -8,3 +8,4 @@ Source/*/bin
 Source/*/obj
 Source/*/test-results
 node_modules
+*.qch
