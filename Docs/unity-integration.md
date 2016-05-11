@@ -65,7 +65,7 @@ public class MyBehaviour : MonoBehaviour
 
 Synchronization Context
 -----------------------
-The [UnitySynchronizationContext](@ref SpicyPixel.Threading.UnitySynchronizationContext) is a convenient way to integrate with code which relies on a [SynchronizationContext](@ref System.Threading.SynchronizationContext) or to post operations back to the calling thread in a scheduler agnostic manner.
+The [UnitySynchronizationContext](@ref SpicyPixel.Threading.UnitySynchronizationContext) is a convenient way to integrate with code which relies on a [SynchronizationContext](https://msdn.microsoft.com/en-us/library/system.threading.synchronizationcontext(v=vs.110).aspx) or to post operations back to the calling thread in a scheduler agnostic manner.
 
 ```{.cs}
 public class MyBehaviour : MonoBehaviour
