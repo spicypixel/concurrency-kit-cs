@@ -1,0 +1,9 @@
+variables:
+  SKIP_INSTALL: "1"
+
+before_script:
+  - npm install
+
+build:
+  script:
+    - node node_modules/.bin/gulp ci

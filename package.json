@@ -1,0 +1,30 @@
+{
+  "name": "cs-spicypixel-concurrency",
+  "version": "1.0.5",
+  "description": "Spicy Pixel Concurrency Kit",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "postinstall": "gulp install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/spicypixel/cs-concurrency-kit.git"
+  },
+  "files": [
+    "index.js",
+    "gulpfile.js",
+    "Source"
+  ],
+  "author": "Spicy Pixel, Inc.",
+  "license": "MIT",
+  "dependencies": {
+    "del": "^2.2.0",
+    "gulp": "^3.9.1",
+    "gulp-msbuild": "^0.3.2",
+    "gulp-nunit-runner": "^0.5.2",
+    "mkdirp": "^0.5.1",
+    "ncp": "^2.0.0",
+    "path-exists": "^2.1.0"
+  }
+}
