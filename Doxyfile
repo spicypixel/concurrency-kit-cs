@@ -1366,7 +1366,7 @@ GENERATE_QHP           = YES
 # the HTML output folder.
 # This tag requires that the tag GENERATE_QHP is set to YES.
 
-QCH_FILE               = ../qt/ConcurrencyKit.qch
+QCH_FILE               = ../qt/spicypixel.concurrency.kit.qch
 
 # The QHP_NAMESPACE tag specifies the namespace to use when generating Qt Help
 # Project output. For more information please see Qt Help Project / Namespace
@@ -1374,7 +1374,7 @@ QCH_FILE               = ../qt/ConcurrencyKit.qch
 # The default value is: org.doxygen.Project.
 # This tag requires that the tag GENERATE_QHP is set to YES.
 
-QHP_NAMESPACE          = com.spicypixel.concurrency
+QHP_NAMESPACE          = spicypixel.concurrency.kit
 
 # The QHP_VIRTUAL_FOLDER tag specifies the namespace to use when generating Qt
 # Help Project output. For more information please see Qt Help Project / Virtual
