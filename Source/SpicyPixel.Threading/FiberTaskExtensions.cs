@@ -153,12 +153,16 @@ namespace SpicyPixel.Threading.Tasks
             //if(outerScheduler is MonoBehaviourTaskScheduler)
             //  outerScheduler = TaskScheduler.Default;
             
-            var outerScheduler = TaskScheduler.Default;
+            //var outerScheduler = TaskScheduler.Default;
+
+			// The thread pool scheduler cannot be used in web scenarios. The outer scheduler
+			// must be the fiber scheduler.
+			var outerScheduler = scheduler;
             
             return task.ContinueWith((Task antecedent) => {
                 var yieldableTask = new YieldableTask(coroutine, cancellationToken, TaskCreationOptions.AttachedToParent);
                 yieldableTask.Start(scheduler);
-            }, cancellationToken, continuationOptions, outerScheduler);
+			}, cancellationToken, continuationOptions, outerScheduler);
         }
 		
 		/// <summary>
@@ -276,12 +280,16 @@ namespace SpicyPixel.Threading.Tasks
             //if(outerScheduler is MonoBehaviourTaskScheduler)
             //  outerScheduler = TaskScheduler.Default;
             
-            var outerScheduler = TaskScheduler.Default;
+            //var outerScheduler = TaskScheduler.Default;
+
+			// The thread pool scheduler cannot be used in web scenarios. The outer scheduler
+			// must be the fiber scheduler.
+			var outerScheduler = scheduler;
             
             return task.ContinueWith((Task antecedent) => {
                 var yieldableTask = new YieldableTask(instruction, cancellationToken, TaskCreationOptions.AttachedToParent);
                 yieldableTask.Start(scheduler);
-            }, cancellationToken, continuationOptions, outerScheduler);
+			}, cancellationToken, continuationOptions, outerScheduler);
         }
         
         /// <summary>
