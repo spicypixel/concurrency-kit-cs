@@ -26,7 +26,7 @@ gulp.task("build", () => buildCode().then(() => buildDocs()));
 gulp.task("docs", () => buildDocs());
 
 // Test with NUnit
-gulp.task("test", () => build().then(() => test()));
+gulp.task("test", () => buildCode().then(() => test()));
 
 // Install
 gulp.task("install", () => build());
