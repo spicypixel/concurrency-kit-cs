@@ -9,3 +9,4 @@ Source/*/obj
 Source/*/test-results
 node_modules
 *.qch
+TestResult.xml
