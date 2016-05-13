@@ -12,13 +12,13 @@
     "url": "https://github.com/spicypixel/concurrency-kit.git"
   },
   "files": [
-    "gulpfile.js",
-    "README.md",
-    "LICENSE.md",
-    "Source",
     "Docs",
     "Doxygen",
-    "Doxyfile"
+    "Source",
+    "Doxyfile",
+    "gulpfile.js",
+    "LICENSE.md",
+    "README.md"
   ],
   "author": "Spicy Pixel, Inc.",
   "license": "MIT",

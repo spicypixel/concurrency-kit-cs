@@ -7,25 +7,29 @@ var spawn = require("child_process").spawn;
 var path = require("path");
 var pathExists = require("path-exists");
 
-// SKIP_INSTALL will be set during CI setup since `npm install` is run
-// to install dependencies. We don"t need to run the build at that
-// time because it will run again when the `ci` task is called.
-if(process.env.SKIP_INSTALL == 1 && process.argv[process.argv.length - 1] == "install") {
-  gutil.log("SKIP_INSTALL was set, skipping install ...");
-  process.exit(0);
-}
-
 // Default task to run continuous integration
 gulp.task("default", ["ci"]);
 
-// Continuous integration is a full rebuild
-gulp.task("ci", ["rebuild"]);
+// Continuous integration runs the test suite
+gulp.task("ci", ["test"]);
 
 // Rebuild is a clean followed by build
 gulp.task("rebuild", () => clean().then(() => build()));
 
 // Clean removes build artifacts
 gulp.task("clean", () => clean());
+
+// Build code and docs
+gulp.task("build", () => buildCode().then(() => buildDocs()));
+
+// Build docs
+gulp.task("docs", () => buildDocs());
+
+// Test with NUnit
+gulp.task("test", () => build().then(() => test()));
+
+// Install
+gulp.task("install", () => build());
 
 function clean() {
   gutil.log(gutil.colors.cyan("Cleaning ..."));
@@ -90,65 +94,6 @@ function buildDocs() {
   });
 }
 
-function installToUnity() {
-    // Install the build into a Unity Assets folder if it exists  
-  var assetsDir = path.join(__dirname, "..", "..", "Assets");
-    
-  return pathExists(assetsDir).then(exists => {
-    if (!exists) {
-      gutil.log("Skipping asset install because folder does not exist: ", assetsDir);
-      return;
-    }
-    
-    gutil.log ("Proceeding with asset install");
-
-    var baseSrcDir = path.join(__dirname, "Source");
-    var binDestDir = path.join(assetsDir, "SpicyPixel", "ConcurrencyKit", "Bin");
-    var testDestDir = path.join(assetsDir, "SpicyPixel", "ConcurrencyKit", "Test");
-    
-    var binAssemblies = [
-      "System.Threading", 
-      "SpicyPixel.Threading",
-      "SpicyPixel.Threading.Unity"];
-
-    var testAssemblies = [
-      "SpicyPixel.Threading.Test",
-      "SpicyPixel.Threading.Unity.Test"];
-    
-    var promises = [];
-    
-    binAssemblies.forEach(assembly => {
-      promises.concat(
-        new Promise((resolve, reject) => {
-          var srcDir = path.join(baseSrcDir, assembly, "bin", "Release");
-          
-          gulp
-            .src(path.join(srcDir, assembly + ".dll"), {base: srcDir})
-            .pipe(gulp.dest(binDestDir))
-            .on("end", resolve)
-            .on("error", reject);
-        })
-      );
-    });
-    
-    testAssemblies.forEach(assembly => {
-      promises.concat(
-        new Promise((resolve, reject) => {
-          var srcDir = path.join(baseSrcDir, assembly, "bin", "Release");
-          
-          gulp
-            .src(path.join(srcDir, assembly + ".dll"), {base: srcDir})
-            .pipe(gulp.dest(testDestDir))
-            .on("end", resolve)
-            .on("error", reject);
-        })
-      );
-    });
-
-    return Promise.all (promises);
-  });
-}
-
 function test() {
   return gulp
     .src(["**/bin/**/*Test.dll"], { read: false })
@@ -157,15 +102,3 @@ function test() {
       teamcity: false
     }));
 }
-
-// Build code and docs
-gulp.task("build", () => buildCode().then(() => buildDocs()));
-
-// Build docs with doxygen
-gulp.task("docs", () => buildDocs());
-
-// Test with NUnit
-gulp.task("test", () => build().then(() => test()));
-
-// Install
-gulp.task("install", () => build().then(() => installToUnity()));
