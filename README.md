@@ -80,5 +80,7 @@ Learn More
 ----------
 Learn more by reading the [Conceptual Documentation](Docs/overview.md) or [API Reference](http://spicypixel.com/developer/concurrency-kit/api-reference/).
 
+See [Building the Kit](Docs/build.md) for information on compiling.
+
 ---
 Copyright (c) 2012-2014 [Spicy Pixel, Inc.](http://spicypixel.com)
