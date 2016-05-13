@@ -15,7 +15,10 @@
     "gulpfile.js",
     "README.md",
     "LICENSE.md",
-    "Source"
+    "Source",
+    "Docs",
+    "Doxygen",
+    "Doxyfile"
   ],
   "author": "Spicy Pixel, Inc.",
   "license": "MIT",
