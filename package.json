@@ -1,19 +1,20 @@
 {
-  "name": "cs-spicypixel-concurrency",
+  "name": "spicypixel-concurrency-kit-cs",
   "version": "1.0.5",
-  "description": "Spicy Pixel Concurrency Kit",
+  "description": "Spicy Pixel Concurrency Kit C#",
   "private": true,
-  "main": "index.js",
+  "main": "gulpfile.js",
   "scripts": {
     "postinstall": "gulp install"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/spicypixel/cs-concurrency-kit.git"
+    "url": "https://github.com/spicypixel/concurrency-kit.git"
   },
   "files": [
-    "index.js",
     "gulpfile.js",
+    "README.md",
+    "LICENSE.md",
     "Source"
   ],
   "author": "Spicy Pixel, Inc.",
