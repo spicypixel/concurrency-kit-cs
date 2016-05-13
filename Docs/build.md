@@ -4,6 +4,9 @@ Building the Kit
 Dependencies
 ------------
 
+### Unity
+Unity is required to build Unity libs.
+
 ### Mono
 Mono is required to build assemblies and for NUnit.
 
