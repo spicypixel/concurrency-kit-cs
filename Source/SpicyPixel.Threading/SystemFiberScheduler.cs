@@ -534,7 +534,11 @@ namespace SpicyPixel.Threading
 				}
 				
 				WaitHandle[] waitHandles = waitHandleList.ToArray();
-				waitHandleList.Remove(schedulerEventWaitHandle);
+
+				// FIXME: Unclear why below was included as the handle 
+				// seems to be needed to wake sleeping fibers when abort is called.
+				//waitHandleList.Remove(schedulerEventWaitHandle);
+
 				WaitHandle[] sleepWaitHandles = waitHandleList.ToArray();
 				
 				runWaitHandle.Reset();
@@ -590,6 +594,10 @@ namespace SpicyPixel.Threading
 							
 							wakeMilliseconds = (int)(wakeTicks / TimeSpan.TicksPerMillisecond);
 						}
+
+						// FIXME: Sleeping tasks can be aborted and this should wake the scheduler.
+						// For some reason the schedulerEventWaitHandle which would do this was not
+						// in the wait list and removed above. Trying with it in the list again.
 												
 						// There was no waiting fiber and we will wait for another signal,
 						// or there was a waiting fiber and we wait until that time.
