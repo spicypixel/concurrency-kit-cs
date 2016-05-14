@@ -164,7 +164,7 @@ namespace SpicyPixel.Threading.Tasks
                 yieldableTask.Start(scheduler);
 			}, cancellationToken, continuationOptions, outerScheduler);
         }
-		
+
 		/// <summary>
         /// Continues the task with a coroutine.
         /// </summary>

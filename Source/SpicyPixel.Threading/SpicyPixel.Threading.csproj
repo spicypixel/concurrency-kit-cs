@@ -55,6 +55,7 @@
     <Compile Include="FiberTaskExtensions.cs" />
     <Compile Include="SystemCoroutine.cs" />
     <Compile Include="FiberUnhandledExceptionEventArgs.cs" />
+    <Compile Include="FiberResult.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\System.Threading\System.Threading.csproj">

@@ -27,6 +27,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 namespace SpicyPixel.Threading
@@ -83,6 +84,7 @@ namespace SpicyPixel.Threading
 		private static int nextId = 0;
 		
 		private IEnumerator coroutine;
+		private Stack<IEnumerator> nestedCoroutines = new Stack<IEnumerator>();
 		
 		private Action action;
         private Action<object> actionObject;
@@ -299,6 +301,67 @@ namespace SpicyPixel.Threading
 			return new Fiber(func, state).Start(scheduler);
 		}
 
+		public static YieldUntilComplete WaitAll (params Fiber[] fibers)
+		{
+			return WaitAll (fibers, Timeout.Infinite, CancellationToken.None);
+		}
+
+		public static YieldUntilComplete WaitAll (Fiber[] fibers, CancellationToken cancellationToken)
+		{
+			return WaitAll (fibers, Timeout.Infinite, cancellationToken);
+		}
+
+		public static YieldUntilComplete WaitAll (Fiber[] fibers, TimeSpan timeout)
+		{
+			return WaitAll (fibers, CheckTimeout (timeout), CancellationToken.None);
+		}
+
+		public static YieldUntilComplete WaitAll (Fiber[] fibers, int millisecondsTimeout)
+		{
+			return WaitAll (fibers, millisecondsTimeout, CancellationToken.None);
+		}
+
+		public static YieldUntilComplete WaitAll (Fiber[] fibers, int millisecondsTimeout, CancellationToken cancellationToken)
+		{
+			if (fibers == null)
+				throw new ArgumentNullException ("fibers");
+
+			foreach (var fiber in fibers) {
+				if (fiber == null)
+					throw new ArgumentException ("fibers", "the fibers argument contains a null element");				
+			}
+
+			return Fiber.StartNew(WaitAllCoroutine(fibers, millisecondsTimeout, cancellationToken));
+		}
+
+		static IEnumerator WaitAllCoroutine(Fiber[] fibers, int millisecondsTimeout, CancellationToken cancellationToken)
+		{
+			var startWait = DateTime.Now;
+			while (true) {
+				if ((millisecondsTimeout != -1 && (DateTime.Now - startWait).TotalMilliseconds >= millisecondsTimeout) ||
+					cancellationToken.IsCancellationRequested) {
+					yield return new FiberResult(false);
+				}
+
+				// TODO: Handle abort?
+				if (fibers.All(f => f.FiberState == FiberState.Stopped)) {
+					Fiber.CurrentFiber.ResultAsObject = true;
+					yield return new FiberResult(true);
+				}
+
+				yield return FiberInstruction.YieldToAnyFiber;
+			}
+		}
+
+		static int CheckTimeout (TimeSpan timeout)
+		{
+			try {
+				return checked ((int)timeout.TotalMilliseconds);
+			} catch (System.OverflowException) {
+				throw new ArgumentOutOfRangeException ("timeout");
+			}
+		}
+
         /// <summary>
         /// Gets user-defined properties associated with the fiber.
         /// </summary>
@@ -342,6 +405,12 @@ namespace SpicyPixel.Threading
 		/// The name.
 		/// </value>
 		public string Name { get; set; }
+
+		/// <summary>
+		/// Gets or sets the result of the fiber's execution as an object.
+		/// </summary>
+		/// <value>The result of the fiber's execution as an object.</value>
+		public object ResultAsObject { get; internal set; }
 		
 		/// <summary>
 		/// Gets a value indicating whether this instance is alive (running).
@@ -598,74 +667,112 @@ namespace SpicyPixel.Threading
 			// in a new fiber temporarily taking its place as current.
 			var lastFiber = Fiber.CurrentFiber;
 			Fiber.CurrentFiber = this;
-			
-			try
-			{	
-				// Process an abort if pending
-				if(FiberState == FiberState.AbortRequested)
-					throw new FiberAbortException();
 
-				object result;
-				
-				// Execute the coroutine or action
-				if(coroutine != null)
+			try {
+				// The loop will execute until hitting a valid instruction.
+				// Specifically, nested coroutines need to execute this until
+				// a yield instruction is hit.
+				while(true)
 				{
-					// Execute coroutine
-					if(coroutine.MoveNext())
+					object result = null;
+
+					// Process an abort if pending
+					if(FiberState == FiberState.AbortRequested)
+						throw new FiberAbortException();
+
+					// Execute the coroutine or action
+					if(nestedCoroutines.Count > 0)
 					{
-						// Get result of execution
-						result = coroutine.Current;
+						var nestedCoroutine = nestedCoroutines.Peek();
+						if(nestedCoroutine.MoveNext())
+						{
+							result = nestedCoroutine.Current;
+						}
+						else
+						{
+							// Nested routine finished
+							nestedCoroutines.Pop();
+							continue;
+						}
+					}
+					else if(coroutine != null)
+					{
+						// Execute coroutine
+						if(coroutine.MoveNext())
+						{
+							// Get result of execution
+							result = coroutine.Current;
+						}
+						else
+						{
+							// Coroutine finished executing
+							result = Stop();
+						}
+					}
+					else if(action != null)
+					{
+						// Execute action
+	                    action();
+						
+						// Action finished executing
+						result = Stop();
+					}
+	                else if(actionObject != null)
+	                {
+	                    // Execute action
+	                    actionObject(objectState);
+	                    
+	                    // Action finished executing
+	                    result = Stop();
+	                }
+					else if(func != null)
+					{
+						result = func();
+						func = null;
+					}
+					else if(funcObject != null)
+					{
+						result = funcObject(objectState);
+						funcObject = null;
 					}
 					else
 					{
-						// Coroutine finished executing
+						// Func execution nulls out the function
+						// so the scheduler will return to here
+						// when complete and then stop.
+						result = Stop ();
+					}
+					
+					// Treat null as a special case
+					if(result == null)
+						return FiberInstruction.YieldToAnyFiber;
+
+					// Return instructions or throw if invalid
+					var instruction = result as FiberInstruction;
+					if(instruction == null)
+					{
+						// If the result was an enumerator there is a nested coroutine to execute
+						if (result is IEnumerator)
+						{
+							// Push the nested coroutine onto the stack
+							nestedCoroutines.Push(result as IEnumerator);
+
+							// For performance we execute nested coroutines until hitting
+							// an actual instruction at the deepest nest level.
+							result = null;
+							continue;
+						}
+
+						// Pass through other values
+	                    return new ObjectInstruction(result);
+					}
+
+					if (instruction is FiberResult)
+					{
+						ResultAsObject = ((FiberResult)instruction).Result;
 						result = Stop();
 					}
-				}
-				else if(action != null)
-				{
-					// Execute action
-                    action();
-					
-					// Action finished executing
-					result = Stop();
-				}
-                else if(actionObject != null)
-                {
-                    // Execute action
-                    actionObject(objectState);
-                    
-                    // Action finished executing
-                    result = Stop();
-                }
-				else if(func != null)
-				{
-					result = func();
-					func = null;
-				}
-				else if(funcObject != null)
-				{
-					result = funcObject(objectState);
-					funcObject = null;
-				}
-				else
-				{
-					// Func execution nulls out the function
-					// so the scheduler will return to here
-					// when complete and then stop.
-					result = Stop ();
-				}
-				
-				// Treat null as a special case
-				if(result == null)
-					return FiberInstruction.YieldToAnyFiber;
 
-				// Return instructions or throw if invalid
-				var instruction = result as FiberInstruction;
-				if(instruction == null)
-                    return new ObjectInstruction(result);
-				else
-				{
 					// Verify same scheduler	
 					if(instruction is YieldUntilComplete && ((YieldUntilComplete)instruction).Fiber.Scheduler != FiberScheduler.Current)
 						throw new InvalidOperationException("Currently only fibers belonging to the same scheduler may be yielded to. FiberScheduler.Current = " 
@@ -690,7 +797,7 @@ namespace SpicyPixel.Threading
                                             + (FiberScheduler.Current == null ? "null" : FiberScheduler.Current.ToString()) 
                                             + ", Fiber.Scheduler = " + (yieldToFiberInstruction.Fiber.Scheduler == null ? "null" : yieldToFiberInstruction.Fiber.Scheduler.ToString()));
 					}
-					
+						
 					return instruction;
 				}
 			}
