@@ -330,9 +330,9 @@ namespace SpicyPixel.Threading
 		/// </remarks>
 		/// <returns>A fiber that waits on all fibers to complete.</returns>
 		/// <param name="fibers">Fibers to wait for completion.</param>
-		public static Fiber WaitAll (params Fiber[] fibers)
+		public static Fiber WhenAll (params Fiber[] fibers)
 		{
-			return WaitAll (fibers, Timeout.Infinite, CancellationToken.None);
+			return WhenAll (fibers, Timeout.Infinite, CancellationToken.None);
 		}
 
 		/// <summary>
@@ -345,9 +345,9 @@ namespace SpicyPixel.Threading
 		/// <returns>A fiber that waits on all fibers to complete.</returns>
 		/// <param name="fibers">Fibers to wait for completion.</param>
 		/// <param name="cancellationToken">Cancellation token.</param>
-		public static Fiber WaitAll (Fiber[] fibers, CancellationToken cancellationToken)
+		public static Fiber WhenAll (Fiber[] fibers, CancellationToken cancellationToken)
 		{
-			return WaitAll (fibers, Timeout.Infinite, cancellationToken);
+			return WhenAll (fibers, Timeout.Infinite, cancellationToken);
 		}
 
 		/// <summary>
@@ -360,9 +360,9 @@ namespace SpicyPixel.Threading
 		/// <returns>A fiber that waits on all fibers to complete.</returns>
 		/// <param name="fibers">Fibers to wait for completion.</param>
 		/// <param name="timeout">Timeout.</param>
-		public static Fiber WaitAll (Fiber[] fibers, TimeSpan timeout)
+		public static Fiber WhenAll (Fiber[] fibers, TimeSpan timeout)
 		{
-			return WaitAll (fibers, CheckTimeout (timeout), CancellationToken.None);
+			return WhenAll (fibers, CheckTimeout (timeout), CancellationToken.None);
 		}
 
 		/// <summary>
@@ -375,9 +375,9 @@ namespace SpicyPixel.Threading
 		/// <returns>A fiber that waits on all fibers to complete.</returns>
 		/// <param name="fibers">Fibers to wait for completion.</param>
 		/// <param name="millisecondsTimeout">Milliseconds timeout.</param>
-		public static Fiber WaitAll (Fiber[] fibers, int millisecondsTimeout)
+		public static Fiber WhenAll (Fiber[] fibers, int millisecondsTimeout)
 		{
-			return WaitAll (fibers, millisecondsTimeout, CancellationToken.None);
+			return WhenAll (fibers, millisecondsTimeout, CancellationToken.None);
 		}
 
 		/// <summary>
@@ -391,7 +391,23 @@ namespace SpicyPixel.Threading
 		/// <param name="fibers">Fibers to wait for completion.</param>
 		/// <param name="millisecondsTimeout">Milliseconds timeout.</param>
 		/// <param name="cancellationToken">Cancellation token.</param>
-		public static Fiber WaitAll (Fiber[] fibers, int millisecondsTimeout, CancellationToken cancellationToken)
+		public static Fiber WhenAll (Fiber[] fibers, int millisecondsTimeout, CancellationToken cancellationToken)
+		{
+			return WhenAll(fibers.AsEnumerable(), millisecondsTimeout, cancellationToken);
+		}
+
+		/// <summary>
+		/// Returns a fiber that waits on all fibers to complete.
+		/// </summary>
+		/// <remarks>
+		/// `Fiber.ResultAsObject` will be `true` if all fibers complete
+		/// successfully or `false` if cancelled or timeout.
+		/// </remarks>
+		/// <returns>A fiber that waits on all fibers to complete.</returns>
+		/// <param name="fibers">Fibers to wait for completion.</param>
+		/// <param name="millisecondsTimeout">Milliseconds timeout.</param>
+		/// <param name="cancellationToken">Cancellation token.</param>
+		public static Fiber WhenAll (IEnumerable<Fiber> fibers, int millisecondsTimeout, CancellationToken cancellationToken)
 		{
 			if (fibers == null)
 				throw new ArgumentNullException ("fibers");
@@ -401,10 +417,10 @@ namespace SpicyPixel.Threading
 					throw new ArgumentException ("fibers", "the fibers argument contains a null element");				
 			}
 
-			return Fiber.StartNew(WaitAllCoroutine(fibers, millisecondsTimeout, cancellationToken));
+			return Fiber.StartNew(WhenAllCoroutine(fibers, millisecondsTimeout, cancellationToken));
 		}
 
-		static IEnumerator WaitAllCoroutine(Fiber[] fibers, int millisecondsTimeout, CancellationToken cancellationToken)
+		static IEnumerator WhenAllCoroutine(IEnumerable<Fiber> fibers, int millisecondsTimeout, CancellationToken cancellationToken)
 		{
 			var startWait = DateTime.Now;
 			while (true) {
@@ -425,25 +441,84 @@ namespace SpicyPixel.Threading
 		/// <summary>
 		/// Returns a fiber that completes when any fiber finishes.
 		/// </summary>
-		/// <returns>A fiber that completes when any fiber finishes.</returns>
 		/// <remarks>
 		/// `Fiber.ResultAsObject` will be the `Fiber` that completed.
 		/// </remarks>
+		/// <returns>A fiber that completes when any fiber finishes.</returns>
 		/// <param name="fibers">Fibers to wait for completion.</param>
 		public static Fiber WhenAny (params Fiber[] fibers)
 		{
-			return WhenAny(fibers.AsEnumerable());
+			return WhenAny (fibers, Timeout.Infinite, CancellationToken.None);
 		}
 
 		/// <summary>
 		/// Returns a fiber that completes when any fiber finishes.
 		/// </summary>
-		/// <returns>A fiber that completes when any fiber finishes.</returns>
 		/// <remarks>
 		/// `Fiber.ResultAsObject` will be the `Fiber` that completed.
 		/// </remarks>
+		/// <returns>A fiber that completes when any fiber finishes.</returns>
 		/// <param name="fibers">Fibers to wait for completion.</param>
-		public static Fiber WhenAny (IEnumerable<Fiber> fibers)
+		/// <param name="cancellationToken">Cancellation token.</param>
+		public static Fiber WhenAny (Fiber[] fibers, CancellationToken cancellationToken)
+		{
+			return WhenAny (fibers, Timeout.Infinite, cancellationToken);
+		}
+
+		/// <summary>
+		/// Returns a fiber that completes when any fiber finishes.
+		/// </summary>
+		/// <remarks>
+		/// `Fiber.ResultAsObject` will be the `Fiber` that completed.
+		/// </remarks>
+		/// <returns>A fiber that completes when any fiber finishes.</returns>
+		/// <param name="fibers">Fibers to wait for completion.</param>
+		/// <param name="timeout">Timeout.</param>
+		public static Fiber WhenAny (Fiber[] fibers, TimeSpan timeout)
+		{
+			return WhenAny (fibers, CheckTimeout (timeout), CancellationToken.None);
+		}
+
+		/// <summary>
+		/// Returns a fiber that completes when any fiber finishes.
+		/// </summary>
+		/// <remarks>
+		/// `Fiber.ResultAsObject` will be the `Fiber` that completed.
+		/// </remarks>
+		/// <returns>A fiber that completes when any fiber finishes.</returns>
+		/// <param name="fibers">Fibers to wait for completion.</param>
+		/// <param name="millisecondsTimeout">Milliseconds timeout.</param>
+		public static Fiber WhenAny (Fiber[] fibers, int millisecondsTimeout)
+		{
+			return WhenAny (fibers, millisecondsTimeout, CancellationToken.None);
+		}
+
+		/// <summary>
+		/// Returns a fiber that completes when any fiber finishes.
+		/// </summary>
+		/// <remarks>
+		/// `Fiber.ResultAsObject` will be the `Fiber` that completed.
+		/// </remarks>
+		/// <returns>A fiber that completes when any fiber finishes.</returns>
+		/// <param name="fibers">Fibers to wait for completion.</param>
+		/// <param name="millisecondsTimeout">Milliseconds timeout.</param>
+		/// <param name="cancellationToken">Cancellation token.</param>
+		public static Fiber WhenAny (Fiber[] fibers, int millisecondsTimeout, CancellationToken cancellationToken)
+		{
+			return WhenAny(fibers.AsEnumerable(), millisecondsTimeout, cancellationToken);
+		}
+
+		/// <summary>
+		/// Returns a fiber that completes when any fiber finishes.
+		/// </summary>
+		/// <remarks>
+		/// `Fiber.ResultAsObject` will be the `Fiber` that completed.
+		/// </remarks>
+		/// <returns>A fiber that completes when any fiber finishes.</returns>
+		/// <param name="fibers">Fibers to wait for completion.</param>
+		/// <param name="millisecondsTimeout">Milliseconds timeout.</param>
+		/// <param name="cancellationToken">Cancellation token.</param>
+		public static Fiber WhenAny (IEnumerable<Fiber> fibers, int millisecondsTimeout, CancellationToken cancellationToken)
 		{
 			if (fibers == null)
 				throw new ArgumentNullException ("fibers");
@@ -453,12 +528,18 @@ namespace SpicyPixel.Threading
 					throw new ArgumentException ("fibers", "the fibers argument contains a null element");				
 			}
 
-			return Fiber.StartNew(WhenAnyCoroutine(fibers));
+			return Fiber.StartNew(WhenAnyCoroutine(fibers, millisecondsTimeout, cancellationToken));
 		}
 
-		static IEnumerator WhenAnyCoroutine(IEnumerable<Fiber> fibers)
+		static IEnumerator WhenAnyCoroutine(IEnumerable<Fiber> fibers, int millisecondsTimeout, CancellationToken cancellationToken)
 		{
+			var startWait = DateTime.Now;
 			while (true) {
+				if ((millisecondsTimeout != -1 && (DateTime.Now - startWait).TotalMilliseconds >= millisecondsTimeout) ||
+					cancellationToken.IsCancellationRequested) {
+					yield return new FiberResult(false);
+				}
+
 				// TODO: Handle abort or exception?
 				var fiber = fibers.FirstOrDefault(f => f.FiberState == FiberState.Stopped);
 

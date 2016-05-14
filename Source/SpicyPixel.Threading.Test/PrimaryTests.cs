@@ -357,7 +357,7 @@ namespace SpicyPixel.Threading.Test
         List<int> waitAllTokens = new List<int>();
 
         [Test()]
-        public void TestWaitAll()
+        public void TestWhenAll()
         {
             waitAllTokens.Clear();
 
@@ -370,15 +370,15 @@ namespace SpicyPixel.Threading.Test
                 Fiber.StartNew(WaitRandomTimeCoroutine(5))
             };
 
-            FiberScheduler.Current.Run(new Fiber(TestWaitAllVerifyRunToStop(fibers)));
+            FiberScheduler.Current.Run(new Fiber(TestWhenAllCoroutine(fibers)));
         }
 
-        IEnumerator TestWaitAllVerifyRunToStop(Fiber[] fibers)
+        IEnumerator TestWhenAllCoroutine(Fiber[] fibers)
         {
             foreach (var fiber in fibers)
                 Assert.AreEqual(FiberState.Running, fiber.FiberState, "Fiber was not running");
 
-            var waitAllFiber = Fiber.WaitAll(fibers);
+            var waitAllFiber = Fiber.WhenAll(fibers);
             yield return waitAllFiber;
 
             foreach (var fiber in fibers)
@@ -396,7 +396,7 @@ namespace SpicyPixel.Threading.Test
         }
 
         [Test()]
-        public void TestWaitAllTimeout()
+        public void TestWhenAllTimeout()
         {
             var fibers = new Fiber[] {
                 Fiber.StartNew(() => new YieldForSeconds(3f)),
@@ -407,13 +407,13 @@ namespace SpicyPixel.Threading.Test
                 Fiber.StartNew(() => new YieldForSeconds(3f))
             };
 
-            FiberScheduler.Current.Run(new Fiber(TestWaitAllVerifyTimeout(fibers)));
+            FiberScheduler.Current.Run(new Fiber(TestWhenAllTimeoutCoroutine(fibers)));
         }
 
-        IEnumerator TestWaitAllVerifyTimeout(Fiber[] fibers)
+        IEnumerator TestWhenAllTimeoutCoroutine(Fiber[] fibers)
         {
             // Timeout after 2s
-            var waitAllFiber = Fiber.WaitAll(fibers, TimeSpan.FromSeconds(2.0));
+            var waitAllFiber = Fiber.WhenAll(fibers, TimeSpan.FromSeconds(2.0));
             yield return waitAllFiber;
 
             // Some should still be running
@@ -431,7 +431,7 @@ namespace SpicyPixel.Threading.Test
         }
 
         [Test()]
-        public void TestWaitAllCancellation()
+        public void TestWhenAllCancellation()
         {
             var fibers = new Fiber[] {
                 Fiber.StartNew(() => new YieldForSeconds(3f)),
@@ -442,16 +442,16 @@ namespace SpicyPixel.Threading.Test
                 Fiber.StartNew(() => new YieldForSeconds(3f))
             };
 
-            FiberScheduler.Current.Run(new Fiber(TestWaitAllVerifyCancellation(fibers)));
+            FiberScheduler.Current.Run(new Fiber(TestWhenAllCancellationCoroutine(fibers)));
         }
 
-        IEnumerator TestWaitAllVerifyCancellation(Fiber[] fibers)
+        IEnumerator TestWhenAllCancellationCoroutine(Fiber[] fibers)
         {
             var cancelSource = new CancellationTokenSource();
             Fiber.StartNew(WaitThenCancel(2f, cancelSource));
 
             // Cancels after 2s
-            var waitAllFiber = Fiber.WaitAll(fibers, cancelSource.Token);
+            var waitAllFiber = Fiber.WhenAll(fibers, cancelSource.Token);
             yield return waitAllFiber;
 
             // Some should still be running
