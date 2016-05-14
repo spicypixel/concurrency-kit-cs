@@ -324,6 +324,10 @@ namespace SpicyPixel.Threading
 		/// <summary>
 		/// Returns a fiber that waits on all fibers to complete.
 		/// </summary>
+		/// <remarks>
+		/// `Fiber.ResultAsObject` will be `true` if all fibers complete
+		/// successfully or `false` if cancelled or timeout.
+		/// </remarks>
 		/// <returns>A fiber that waits on all fibers to complete.</returns>
 		/// <param name="fibers">Fibers to wait for completion.</param>
 		public static Fiber WaitAll (params Fiber[] fibers)
@@ -334,6 +338,10 @@ namespace SpicyPixel.Threading
 		/// <summary>
 		/// Returns a fiber that waits on all fibers to complete.
 		/// </summary>
+		/// <remarks>
+		/// `Fiber.ResultAsObject` will be `true` if all fibers complete
+		/// successfully or `false` if cancelled or timeout.
+		/// </remarks>
 		/// <returns>A fiber that waits on all fibers to complete.</returns>
 		/// <param name="fibers">Fibers to wait for completion.</param>
 		/// <param name="cancellationToken">Cancellation token.</param>
@@ -345,6 +353,10 @@ namespace SpicyPixel.Threading
 		/// <summary>
 		/// Returns a fiber that waits on all fibers to complete.
 		/// </summary>
+		/// <remarks>
+		/// `Fiber.ResultAsObject` will be `true` if all fibers complete
+		/// successfully or `false` if cancelled or timeout.
+		/// </remarks>
 		/// <returns>A fiber that waits on all fibers to complete.</returns>
 		/// <param name="fibers">Fibers to wait for completion.</param>
 		/// <param name="timeout">Timeout.</param>
@@ -356,6 +368,10 @@ namespace SpicyPixel.Threading
 		/// <summary>
 		/// Returns a fiber that waits on all fibers to complete.
 		/// </summary>
+		/// <remarks>
+		/// `Fiber.ResultAsObject` will be `true` if all fibers complete
+		/// successfully or `false` if cancelled or timeout.
+		/// </remarks>
 		/// <returns>A fiber that waits on all fibers to complete.</returns>
 		/// <param name="fibers">Fibers to wait for completion.</param>
 		/// <param name="millisecondsTimeout">Milliseconds timeout.</param>
@@ -367,6 +383,10 @@ namespace SpicyPixel.Threading
 		/// <summary>
 		/// Returns a fiber that waits on all fibers to complete.
 		/// </summary>
+		/// <remarks>
+		/// `Fiber.ResultAsObject` will be `true` if all fibers complete
+		/// successfully or `false` if cancelled or timeout.
+		/// </remarks>
 		/// <returns>A fiber that waits on all fibers to complete.</returns>
 		/// <param name="fibers">Fibers to wait for completion.</param>
 		/// <param name="millisecondsTimeout">Milliseconds timeout.</param>
