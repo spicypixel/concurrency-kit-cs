@@ -1045,10 +1045,12 @@ namespace SpicyPixel.Threading
 					}
 					else
 					{
-						if(!eventArgs.Handled)
+						// If the event was handled or is an abort then just stop.
+						// Otherwise, rethrow and let the scheduler deal with it.
+						if(!eventArgs.Handled && !(fiberException is FiberAbortException))
 							throw fiberException;
 						else
-							return Stop ();
+							return Stop (); // FIXME: New state for aborted?
 					}
 				}
 				catch(Exception fiberOrHandlerException)
@@ -1068,7 +1070,7 @@ namespace SpicyPixel.Threading
 					// but they won't know this fiber failed due to an exception
 					// unless they handled the exception above or wait for
 					// the scheduler to do something after the throw below.
-					Stop();
+					Stop(); // FIXME: New state for faulted?
 					
 					// Throw the exception back to the scheduler.
 					throw fiberOrHandlerException;
