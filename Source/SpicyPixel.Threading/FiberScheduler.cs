@@ -49,7 +49,18 @@ namespace SpicyPixel.Threading
         [ThreadStatic]
         private static FiberScheduler currentScheduler;
 
-		private EventHandler<FiberUnhandledExceptionEventArgs> unhandledException;
+        CancellationTokenSource cancelSource = new CancellationTokenSource();
+
+        /// <summary>
+        /// Gets the cancellation token set when the scheduler is destroyed.
+        /// </summary>
+        /// <value>
+        /// The cancellation token.
+        /// </value>
+        public CancellationToken CancellationToken
+        {
+            get { return cancelSource.Token; }
+        }
 
         /// <summary>
         /// Gets the default fiber scheduler for the thread.
@@ -69,7 +80,7 @@ namespace SpicyPixel.Threading
                     // Make a new scheduler
                     SetCurrentScheduler(new SystemFiberScheduler(), true);
                 }
-                
+
                 return currentScheduler;
             }
 			
@@ -135,22 +146,6 @@ namespace SpicyPixel.Threading
         /// </value>
         internal SynchronizationContext SynchronizationContext { get; private set; }
 
-        /// <summary>
-		/// Raised when a fiber throws an unhandled exception.
-		/// </summary>
-		/// <remarks>
-		/// By processing the exception and marking <see cref="FiberUnhandledExceptionEventArgs.Handled"/>
-		/// as <c>true</c>, the Fiber will still terminate because it is not possible
-		/// to recover from an unhandled exception in a coroutine. However, the scheduler
-		/// will receive a fiber <see cref="StopInstruction"/> instead of an exception
-		/// and will therefore continue to execute other fibers.
-		/// </remarks>
-		public event EventHandler<FiberUnhandledExceptionEventArgs> UnhandledException
-		{
-			add { unhandledException += value; }
-			remove { unhandledException -= value; }
-		}
-
 		/*
 		/// <summary>
 		/// Gets a value indicating whether the current thread is the fiber scheduler thread.
@@ -176,7 +171,7 @@ namespace SpicyPixel.Threading
 		}
 		
 		/// <summary>
-		/// Gets or sets a value indicating whether this <see cref="SpicyPixel.Threading.SystemFiberScheduler"/> allows inlining.
+		/// Gets or sets a value indicating whether this <see cref="SpicyPixel.Threading.FiberScheduler"/> allows inlining.
 		/// </summary>
 		/// <value>
 		/// <c>true</c> if inlining of tasks on the scheduler thread is allowed; otherwise, <c>false</c>. Default is <c>true</c>.
@@ -192,42 +187,7 @@ namespace SpicyPixel.Threading
 			schedulerThread = Thread.CurrentThread;
 			SynchronizationContext = new FiberSchedulerSynchronizationContext(this);
 		}
-		
-		/// <summary>
-		/// Raises the unhandled exception event.
-		/// </summary>
-		/// <remarks>
-		/// Derived schedulers should invoke this method if an unhandled exception
-		/// occurs to determine whether to throw the exception or to continue
-		/// processing other fibers.
-		/// </remarks>
-		/// <returns>
-		/// Returns <c>true</c> if the exception was handled. 
-		/// </returns>
-		/// <param name='fiber'>
-		/// The fiber.
-		/// </param>
-		/// <param name='ex'>
-		/// The exception.
-		/// </param>
-		protected bool OnUnhandledException(Fiber fiber, Exception ex)
-		{
-			// Invoke the exception handler (which could throw)
-			var unhandledException = this.unhandledException;
-			var eventArgs = new FiberUnhandledExceptionEventArgs(fiber, ex);
-			if(unhandledException != null)
-			{
-				foreach(var subscriber in unhandledException.GetInvocationList())
-				{
-					subscriber.DynamicInvoke(this, eventArgs);
-					if(eventArgs.Handled)
-						break;
-				}
-			}
-			
-			return eventArgs.Handled;
-		}
-		
+				
 		// Used by Fiber to invoke the protected methods
 		void IFiberScheduler.QueueFiber(Fiber fiber)
 		{
@@ -406,7 +366,7 @@ namespace SpicyPixel.Threading
 			if(disposing) 
 			{
 				// Free other state (managed objects).
-				
+                cancelSource.Cancel();
 			}
 			
 			// Free your own state (unmanaged objects).

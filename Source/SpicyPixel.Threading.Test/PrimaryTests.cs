@@ -45,12 +45,12 @@ namespace SpicyPixel.Threading.Test
             var cancelSource = new CancellationTokenSource();
 						
             var task = Task.Factory.StartNew(() => {
-                Console.Out.WriteLine("Calling Fiber.StartNew(TestFiberNumbers())");
-                Fiber.StartNew(TestFiberNumbers());
-                Console.Out.WriteLine("Calling Fiber.StartNew(TestFiberLetters())");
-                Fiber.StartNew(TestFiberLetters());
+                Console.Out.WriteLine("Calling Fiber.Factory.StartNew(TestFiberNumbers())");
+                Fiber.Factory.StartNew(TestFiberNumbers());
+                Console.Out.WriteLine("Calling Fiber.Factory.StartNew(TestFiberLetters())");
+                Fiber.Factory.StartNew(TestFiberLetters());
                 Console.Out.WriteLine("WaitThenCancel");
-                Fiber.StartNew(WaitThenCancel(2f, cancelSource));
+                Fiber.Factory.StartNew(WaitThenCancel(2f, cancelSource));
                 Console.Out.WriteLine("Run");
                 FiberScheduler.Current.Run(cancelSource.Token);
                 Console.Out.WriteLine("Run finished");
@@ -89,8 +89,8 @@ namespace SpicyPixel.Threading.Test
         [Test()]
         public void TestFunc()
         {
-            Fiber.StartNew(TestFiberLetters());
-            var waitOnFiber2 = Fiber.StartNew(TestFiberNumbers());
+            Fiber.Factory.StartNew(TestFiberLetters());
+            var waitOnFiber2 = Fiber.Factory.StartNew(TestFiberNumbers());
             var mainFiber = new Fiber(() => new YieldUntilComplete(waitOnFiber2));
             FiberScheduler.Current.Run(mainFiber); 
         }
@@ -99,7 +99,7 @@ namespace SpicyPixel.Threading.Test
         public void TestYieldForSeconds()
         {
             var start = DateTime.Now;
-            //var wait = Fiber.StartNew(() => new YieldForSeconds(2));
+            //var wait = Fiber.Factory.StartNew(() => new YieldForSeconds(2));
             //FiberScheduler.Current.Run(new Fiber(() => wait));
             //FiberScheduler.Current.Run(new Fiber(() => new YieldForSeconds(2)));
 			
@@ -192,12 +192,12 @@ namespace SpicyPixel.Threading.Test
         {
             testNestingSteps.Add(1);
             if (asFiber)
-                yield return Fiber.StartNew(Fade());
+                yield return Fiber.Factory.StartNew(Fade());
             else
                 yield return Fade();
             testNestingSteps.Add(4);
             if (asFiber)
-                yield return Fiber.StartNew(MoveAndShoot(asFiber));
+                yield return Fiber.Factory.StartNew(MoveAndShoot(asFiber));
             else
                 yield return MoveAndShoot(asFiber);
             testNestingSteps.Add(10);
@@ -216,7 +216,7 @@ namespace SpicyPixel.Threading.Test
             yield return new YieldForSeconds(3.0f);
             testNestingSteps.Add(6);
             if (asFiber)
-                yield return Fiber.StartNew(Shoot());
+                yield return Fiber.Factory.StartNew(Shoot());
             else
                 yield return Shoot();
             testNestingSteps.Add(9);
@@ -291,17 +291,17 @@ namespace SpicyPixel.Threading.Test
         private IEnumerator IncrementerCoroutine1()
         {
             Console.Out.WriteLine("IncrementerCoroutine1: Start");
-            //Fiber other = Fiber.StartNew(IncrementerCoroutine2(Fiber.CurrentFiber)).Fiber;
+            //Fiber other = Fiber.Factory.StartNew(IncrementerCoroutine2(Fiber.CurrentFiber)).Fiber;
             Fiber other = new Fiber(IncrementerCoroutine2(Fiber.CurrentFiber));
             while (yieldToFiberCounter1 < 25) {
                 Console.Out.WriteLine("IncrementerCoroutine1: Loop");
                 ++yieldToFiberTotalCounter;
                 ++yieldToFiberCounter1;
                 Console.Out.WriteLine("IncrementerCoroutine1: Yield 1");
-                if (other.FiberState != FiberState.Stopped)
+                if (!other.IsCompleted)
                     yield return new YieldToFiber(other);
                 Console.Out.WriteLine("IncrementerCoroutine1: Yield 2");
-                if (other.FiberState != FiberState.Stopped)
+                if (!other.IsCompleted)
                     yield return new YieldToFiber(other);
             }
             Console.Out.WriteLine("IncrementerCoroutine1: Done");
@@ -315,7 +315,7 @@ namespace SpicyPixel.Threading.Test
                 ++yieldToFiberTotalCounter;
                 ++yieldToFiberCounter2;
                 Console.Out.WriteLine("IncrementerCoroutine2: Yield");
-                if (other.FiberState != FiberState.Stopped)
+                if (!other.IsCompleted)
                     yield return new YieldToFiber(other);
             }
             Console.Out.WriteLine("IncrementerCoroutine2: Done");
@@ -323,8 +323,8 @@ namespace SpicyPixel.Threading.Test
 
         private IEnumerator RunWithFiberCoroutine()
         {
-            yield return Fiber.StartNew(TestFiberLetters());
-            yield return Fiber.StartNew(TestFiberNumbers());
+            yield return Fiber.Factory.StartNew(TestFiberLetters());
+            yield return Fiber.Factory.StartNew(TestFiberNumbers());
         }
 
         private IEnumerator TestFiberNumbers()
@@ -362,12 +362,12 @@ namespace SpicyPixel.Threading.Test
             waitAllTokens.Clear();
 
             var fibers = new Fiber[] {
-                Fiber.StartNew(WaitRandomTimeCoroutine(0)),
-                Fiber.StartNew(WaitRandomTimeCoroutine(1)),
-                Fiber.StartNew(WaitRandomTimeCoroutine(2)),
-                Fiber.StartNew(WaitRandomTimeCoroutine(3)),
-                Fiber.StartNew(WaitRandomTimeCoroutine(4)),
-                Fiber.StartNew(WaitRandomTimeCoroutine(5))
+                Fiber.Factory.StartNew(WaitRandomTimeCoroutine(0)),
+                Fiber.Factory.StartNew(WaitRandomTimeCoroutine(1)),
+                Fiber.Factory.StartNew(WaitRandomTimeCoroutine(2)),
+                Fiber.Factory.StartNew(WaitRandomTimeCoroutine(3)),
+                Fiber.Factory.StartNew(WaitRandomTimeCoroutine(4)),
+                Fiber.Factory.StartNew(WaitRandomTimeCoroutine(5))
             };
 
             FiberScheduler.Current.Run(new Fiber(TestWhenAllCoroutine(fibers)));
@@ -376,13 +376,13 @@ namespace SpicyPixel.Threading.Test
         IEnumerator TestWhenAllCoroutine(Fiber[] fibers)
         {
             foreach (var fiber in fibers)
-                Assert.AreEqual(FiberState.Running, fiber.FiberState, "Fiber was not running");
+                Assert.IsFalse(fiber.IsCompleted, "Fiber was not running");
 
             var waitAllFiber = Fiber.WhenAll(fibers);
             yield return waitAllFiber;
 
             foreach (var fiber in fibers)
-                Assert.AreEqual(FiberState.Stopped, fiber.FiberState, "Fiber was still running and should have been stopped");
+                Assert.IsTrue(fiber.IsCompleted, "Fiber was still running and should have been stopped");
 
             // Result should be true
             Assert.IsNotNull(waitAllFiber.ResultAsObject, "Result should not be null");
@@ -399,12 +399,12 @@ namespace SpicyPixel.Threading.Test
         public void TestWhenAllTimeout()
         {
             var fibers = new Fiber[] {
-                Fiber.StartNew(() => new YieldForSeconds(3f)),
-                Fiber.StartNew(() => new YieldForSeconds(3f)),
-                Fiber.StartNew(() => new YieldForSeconds(3f)),
-                Fiber.StartNew(() => new YieldForSeconds(3f)),
-                Fiber.StartNew(() => new YieldForSeconds(3f)),
-                Fiber.StartNew(() => new YieldForSeconds(3f))
+                Fiber.Factory.StartNew(() => new YieldForSeconds(3f)),
+                Fiber.Factory.StartNew(() => new YieldForSeconds(3f)),
+                Fiber.Factory.StartNew(() => new YieldForSeconds(3f)),
+                Fiber.Factory.StartNew(() => new YieldForSeconds(3f)),
+                Fiber.Factory.StartNew(() => new YieldForSeconds(3f)),
+                Fiber.Factory.StartNew(() => new YieldForSeconds(3f))
             };
 
             FiberScheduler.Current.Run(new Fiber(TestWhenAllTimeoutCoroutine(fibers)));
@@ -417,13 +417,13 @@ namespace SpicyPixel.Threading.Test
             yield return waitAllFiber;
 
             // Some should still be running
-            Assert.IsTrue(fibers.Any(f => f.FiberState == FiberState.Running), "Some fiber should have been running but was not");
+            Assert.IsTrue(fibers.Any(f => f.Status == FiberStatus.Running), "Some fiber should have been running but was not");
 
             // Wait 2s
             yield return new YieldForSeconds(2);
 
             // Now none should be running
-            Assert.IsFalse(fibers.Any(f => f.FiberState == FiberState.Running), "No fibers should have been running");
+            Assert.IsFalse(fibers.Any(f => f.Status == FiberStatus.Running), "No fibers should have been running");
 
             // Result should be false
             Assert.IsNotNull(waitAllFiber.ResultAsObject, "Result should not be null");
@@ -434,12 +434,12 @@ namespace SpicyPixel.Threading.Test
         public void TestWhenAllCancellation()
         {
             var fibers = new Fiber[] {
-                Fiber.StartNew(() => new YieldForSeconds(3f)),
-                Fiber.StartNew(() => new YieldForSeconds(3f)),
-                Fiber.StartNew(() => new YieldForSeconds(3f)),
-                Fiber.StartNew(() => new YieldForSeconds(3f)),
-                Fiber.StartNew(() => new YieldForSeconds(3f)),
-                Fiber.StartNew(() => new YieldForSeconds(3f))
+                Fiber.Factory.StartNew(() => new YieldForSeconds(3f)),
+                Fiber.Factory.StartNew(() => new YieldForSeconds(3f)),
+                Fiber.Factory.StartNew(() => new YieldForSeconds(3f)),
+                Fiber.Factory.StartNew(() => new YieldForSeconds(3f)),
+                Fiber.Factory.StartNew(() => new YieldForSeconds(3f)),
+                Fiber.Factory.StartNew(() => new YieldForSeconds(3f))
             };
 
             FiberScheduler.Current.Run(new Fiber(TestWhenAllCancellationCoroutine(fibers)));
@@ -448,20 +448,20 @@ namespace SpicyPixel.Threading.Test
         IEnumerator TestWhenAllCancellationCoroutine(Fiber[] fibers)
         {
             var cancelSource = new CancellationTokenSource();
-            Fiber.StartNew(WaitThenCancel(2f, cancelSource));
+            Fiber.Factory.StartNew(WaitThenCancel(2f, cancelSource));
 
             // Cancels after 2s
             var waitAllFiber = Fiber.WhenAll(fibers, cancelSource.Token);
             yield return waitAllFiber;
 
             // Some should still be running
-            Assert.IsTrue(fibers.Any(f => f.FiberState == FiberState.Running), "Some fiber should have been running but was not");
+            Assert.IsTrue(fibers.Any(f => f.Status == FiberStatus.Running), "Some fiber should have been running but was not");
 
             // Wait 2s
             yield return new YieldForSeconds(2);
 
             // Now none should be running
-            Assert.IsFalse(fibers.Any(f => f.FiberState == FiberState.Running), "No fibers should have been running");
+            Assert.IsFalse(fibers.Any(f => f.Status == FiberStatus.Running), "No fibers should have been running");
 
             // Result should be false
             Assert.IsNotNull(waitAllFiber.ResultAsObject, "Result should not be null");
@@ -472,12 +472,12 @@ namespace SpicyPixel.Threading.Test
         public void TestWhenAny()
         {
             var fibers = new Fiber[] {
-                Fiber.StartNew(() => new YieldForSeconds(1.5f)),
-                Fiber.StartNew(() => new YieldForSeconds(1.6f)),
-                Fiber.StartNew(() => new YieldForSeconds(1f)),
-                Fiber.StartNew(() => new YieldForSeconds(1.8f)),
-                Fiber.StartNew(() => new YieldForSeconds(1.9f)),
-                Fiber.StartNew(() => new YieldForSeconds(1.4f))
+                Fiber.Factory.StartNew(() => new YieldForSeconds(1.5f)),
+                Fiber.Factory.StartNew(() => new YieldForSeconds(1.6f)),
+                Fiber.Factory.StartNew(() => new YieldForSeconds(1f)),
+                Fiber.Factory.StartNew(() => new YieldForSeconds(1.8f)),
+                Fiber.Factory.StartNew(() => new YieldForSeconds(1.9f)),
+                Fiber.Factory.StartNew(() => new YieldForSeconds(1.4f))
             };
 
             FiberScheduler.Current.Run(new Fiber(TestWhenAnyCoroutine(fibers)));
@@ -491,16 +491,16 @@ namespace SpicyPixel.Threading.Test
 
             // Verify index 2 was the winner and is done
             Assert.AreEqual(fibers[2], waitAllFiber.ResultAsObject, "Fiber at index 2 was not the winner and should be");
-            Assert.IsTrue(fibers[2].FiberState == FiberState.Stopped, "Fiber at index 2 should have been stopped");
+            Assert.IsTrue(fibers[2].IsCompleted, "Fiber at index 2 should have been stopped");
 
             // Others should still be running
-            Assert.IsTrue(fibers.Any(f => f.FiberState == FiberState.Running), "Other fibers should have been running but were not");
+            Assert.IsTrue(fibers.Any(f => f.Status == FiberStatus.Running), "Other fibers should have been running but were not");
 
             // Wait 2s more
             yield return new YieldForSeconds(2);
 
             // Now none should be running
-            Assert.IsFalse(fibers.Any(f => f.FiberState == FiberState.Running), "No fibers should have been running");
+            Assert.IsTrue(fibers.All(f => f.IsCompleted), "No fibers should have been running");
         }
 
         [Test()]

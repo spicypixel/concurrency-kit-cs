@@ -38,7 +38,7 @@ namespace SpicyPixel.Threading
 	/// </summary>
 	/// <remarks>
 	/// Although no fibers execute after the scheduler is shutdown, none of the
-	/// fibers are transitioned to a <see cref="FiberState.Stopped"/> state and therefore
+	/// fibers are transitioned to a <see cref="FiberStatus.RanToCompletion"/> state and therefore
 	/// it's not safe for a fiber to wait on a fiber outside of its own scheduler.
 	/// This is currently enforced by <see cref="FiberScheduler.ExecuteFiber"/> for now although it would be
 	/// possible to support fiber waits across schedulers in the future.
@@ -267,7 +267,7 @@ namespace SpicyPixel.Threading
 			// if the queue did happen because non-running
 			// fibers are skipped, but it's better to
 			// shortcut here.
-			if(fiber.FiberState != FiberState.Running)
+            if(fiber.Status != FiberStatus.WaitingToRun)
 				return;
 				
 			// Entering queue fiber where recursion might matter
@@ -368,8 +368,8 @@ namespace SpicyPixel.Threading
 				if(item == null)
 					break;
 				
-				// Skip items that have been aborted or completed
-				if(item.FiberState == FiberState.Stopped)
+				// Skip completed items
+                if(item.IsCompleted)
 					continue;
 				
 				ExecuteFiberInternal(item);
@@ -393,12 +393,12 @@ namespace SpicyPixel.Threading
 				
 				Fiber fiber = item.Item1;
 				
-				// Skip items that have been aborted or completed
-				if(fiber.FiberState == FiberState.Stopped)
+				// Skip completed items
+                if(fiber.IsCompleted)
 					continue;
 				
-				// Run if time otherwise re-enqueue
-				if(item.Item2 <= currentTime || fiber.FiberState == FiberState.AbortRequested)
+				// Run if time or cancelled otherwise re-enqueue
+                if(item.Item2 <= currentTime || fiber.cancelToken.IsCancellationRequested)
 					ExecuteFiberInternal(item.Item1);
 				else
 					sleepingFibers.Enqueue(item);
@@ -443,7 +443,7 @@ namespace SpicyPixel.Threading
 			// Find the earliest wake time
 			foreach(var fiber in sleepingFibers)
 			{
-				if(fiber.Item1.FiberState == FiberState.AbortRequested)
+                if(fiber.Item1.cancelToken.IsCancellationRequested)
 				{
 					fiberWakeTime = 0f; // wake immediately
 					break;
@@ -525,12 +525,12 @@ namespace SpicyPixel.Threading
 					waitHandleList.Add(mainFiberCompleteCancelSource.Token.WaitHandle);
 
 					// Start the main fiber if it isn't running yet
-					if(fiber.FiberState == FiberState.Unstarted)
+                    if(fiber.Status == FiberStatus.Created)
 						fiber.Start(this);
 					
 					// Start another fiber that waits on the main fiber to complete.
 					// When it does, it raises a cancellation.
-					Fiber.StartNew(CancelWhenComplete(fiber, mainFiberCompleteCancelSource), this);
+					Fiber.Factory.StartNew(CancelWhenComplete(fiber, mainFiberCompleteCancelSource), this);
 				}
 				
 				WaitHandle[] waitHandles = waitHandleList.ToArray();
@@ -641,46 +641,35 @@ namespace SpicyPixel.Threading
 		private void ExecuteFiberInternal(Fiber fiber)
 		{
 			Fiber currentFiber = fiber;
-			try
+			Fiber nextFiber;
+
+			while(currentFiber != null)
 			{
-				Fiber nextFiber;
-				while(currentFiber != null)
-				{
-					// Execute the fiber
-					var fiberInstruction = ExecuteFiber(currentFiber);
-		
-					// Nothing more to do if stopped
-					if(!currentFiber.IsAlive)
-						return;
-		
-					// Handle special fiber instructions or queue for another update
-					bool fiberQueued = false;
-					OnFiberInstruction(currentFiber, fiberInstruction, out fiberQueued, out nextFiber);
-					
-					// If the fiber is still running but wasn't added to a special queue by
-					// an instruction then it needs to be added to the execution queue
-					// to run in the next Update().
-					//
-					// Check alive state again in case an instruction resulted
-					// in an inline execution and altered state.
-					if(!fiberQueued && currentFiber.IsAlive) {
-						// Send the fiber to the queue and don't execute inline
-						// since we're done this update
-						QueueFiberForExecution(currentFiber);
-					}
-					
-					// Switch to the next fiber if an instruction says to do so
-					currentFiber = nextFiber;
+				// Execute the fiber
+				var fiberInstruction = ExecuteFiber(currentFiber);
+	
+				// Nothing more to do if stopped
+                if(currentFiber.IsCompleted)
+					return;
+	
+				// Handle special fiber instructions or queue for another update
+				bool fiberQueued = false;
+				OnFiberInstruction(currentFiber, fiberInstruction, out fiberQueued, out nextFiber);
+				
+				// If the fiber is still running but wasn't added to a special queue by
+				// an instruction then it needs to be added to the execution queue
+				// to run in the next Update().
+				//
+				// Check alive state again in case an instruction resulted
+				// in an inline execution and altered state.
+                if(!fiberQueued && !currentFiber.IsCompleted) {
+					// Send the fiber to the queue and don't execute inline
+					// since we're done this update
+					QueueFiberForExecution(currentFiber);
 				}
-			}
-			catch(Exception ex)
-			{
-				// Although this exception must result in the fiber
-				// being terminated, it does not have to result in the
-				// scheduler being brought down unless the exception
-				// handler rethrows the exception
-				if(!OnUnhandledException(currentFiber, ex))
-					throw ex;
+				
+				// Switch to the next fiber if an instruction says to do so
+				currentFiber = nextFiber;
 			}
 		}
 		
@@ -703,23 +692,13 @@ namespace SpicyPixel.Threading
 				// this callback could occur from another thread and
 				// therefore after Dispose(). Would probably need a lock.
 				
-				// Watch for completion
-				EventHandler<EventArgs> completed = null;
-				completed = (sender, e) => 
-				{
-					var originalCompleteOnce = Interlocked.CompareExchange(ref completeOnce, 1, 0);
-					if(originalCompleteOnce != 0)
-						return;
-					
-					yieldUntilComplete.Fiber.Completed -= completed;
-					//QueueFiberForExecution(fiber);
-					QueueFiber(fiber); // optionally execute inline when the completion occurs
-				};
-				yieldUntilComplete.Fiber.Completed += completed;
-				
-				// If the watched fiber is already complete then continue immediately
-				if(yieldUntilComplete.Fiber.FiberState == FiberState.Stopped)
-					completed(yieldUntilComplete.Fiber, EventArgs.Empty);
+                yieldUntilComplete.Fiber.ContinueWith ((f) => {
+                    var originalCompleteOnce = Interlocked.CompareExchange(ref completeOnce, 1, 0);
+                    if(originalCompleteOnce != 0)
+                        return;
+
+                    QueueFiber(fiber); // optionally execute inline when the completion occurs
+                });
 
 				fiberQueued = true;
 				return;

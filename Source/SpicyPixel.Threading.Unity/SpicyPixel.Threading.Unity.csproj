@@ -51,6 +51,7 @@
     <Compile Include="UnityTaskScheduler.cs" />
     <Compile Include="UnityTaskFactory.cs" />
     <Compile Include="UnityFiberExtensions.cs" />
+    <Compile Include="UnityFiberFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\System.Threading\System.Threading.csproj">

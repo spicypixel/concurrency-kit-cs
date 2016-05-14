@@ -46,6 +46,7 @@ namespace SpicyPixel.Threading
 	{
 		private TaskFactory _taskFactory;
 		private TaskScheduler _taskScheduler;
+        private FiberFactory _fiberFactory;
 		private FiberScheduler _fiberScheduler;
 	
 		/// <summary>
@@ -84,6 +85,14 @@ namespace SpicyPixel.Threading
 			get { return _taskScheduler; }
 		}
 		
+        /// <summary>
+        /// Gets the fiber factory.
+        /// </summary>
+        /// <value>The fiber factory.</value>
+        public FiberFactory fiberFactory {
+            get { return _fiberFactory; }
+        }
+
 		/// <summary>
 		/// Gets the fiber scheduler for queuing to this MonoBehaviour.
 		/// </summary>
@@ -107,6 +116,7 @@ namespace SpicyPixel.Threading
 			_taskFactory = this.CreateTaskFactory();
 			_taskScheduler = _taskFactory.Scheduler;
 			_fiberScheduler = ((FiberTaskScheduler)_taskScheduler).FiberScheduler;
+            _fiberFactory = new FiberFactory(_fiberScheduler);
 		}
 	}
 }

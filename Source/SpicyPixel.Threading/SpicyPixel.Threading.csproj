@@ -39,7 +39,6 @@
     <Compile Include="FiberInstruction.cs" />
     <Compile Include="FiberTaskScheduler.cs" />
     <Compile Include="Fiber.cs" />
-    <Compile Include="FiberState.cs" />
     <Compile Include="IFiberScheduler.cs" />
     <Compile Include="SystemFiberScheduler.cs" />
     <Compile Include="FiberScheduler.cs" />
@@ -54,8 +53,16 @@
     <Compile Include="ObjectInstruction.cs" />
     <Compile Include="FiberTaskExtensions.cs" />
     <Compile Include="SystemCoroutine.cs" />
-    <Compile Include="FiberUnhandledExceptionEventArgs.cs" />
     <Compile Include="FiberResult.cs" />
+    <Compile Include="FiberContinuationOptions.cs" />
+    <Compile Include="FiberContinuation.cs" />
+    <Compile Include="FiberStatus.cs" />
+    <Compile Include="Fiber.WhenAll.cs" />
+    <Compile Include="Fiber.WhenAny.cs" />
+    <Compile Include="Fiber.Delay.cs" />
+    <Compile Include="Fiber.ContinueWith.cs" />
+    <Compile Include="FiberFactory.cs" />
+    <Compile Include="FiberFactory.StartNew.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\System.Threading\System.Threading.csproj">

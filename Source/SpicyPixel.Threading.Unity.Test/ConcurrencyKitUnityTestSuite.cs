@@ -82,12 +82,12 @@ public class ConcurrencyKitUnityTestSuite : MonoBehaviour
 			++yieldToFiberTotalCounter;
 			++yieldToFiberCounter1;
 			Debug.Log("IncrementerCoroutine1: Yield 1");
-			if(other.FiberState != FiberState.Stopped)
+			if(!other.IsCompleted)
 				yield return new YieldToFiber(other);
 			else
 				Debug.LogWarning("IncrementerCoroutine1: Can't yield to stopped fiber");
 			Debug.Log("IncrementerCoroutine1: Yield 2");
-			if(other.FiberState != FiberState.Stopped)
+            if(!other.IsCompleted)
 				yield return new YieldToFiber(other);
 			else
 				Debug.LogWarning("IncrementerCoroutine1: Can't yield to stopped fiber");
@@ -105,7 +105,7 @@ public class ConcurrencyKitUnityTestSuite : MonoBehaviour
 			++yieldToFiberTotalCounter;
 			++yieldToFiberCounter2;
 			Debug.Log("IncrementerCoroutine2: Yield");
-			if(other.FiberState != FiberState.Stopped)
+            if(!other.IsCompleted)
 				yield return new YieldToFiber(other);
 			else
 				Debug.LogWarning("IncrementerCoroutine2: Can't yield to stopped fiber");

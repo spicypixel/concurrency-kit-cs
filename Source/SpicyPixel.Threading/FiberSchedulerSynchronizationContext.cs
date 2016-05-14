@@ -66,7 +66,7 @@ namespace SpicyPixel.Threading
 		{
 			// The scheduler may choose to inline this if the Post
 			// is executed from the scheduler thread.
-			Fiber.StartNew(() => {
+			Fiber.Factory.StartNew(() => {
 				d(state);
 			}, scheduler);
 		}
@@ -103,7 +103,7 @@ namespace SpicyPixel.Threading
 			// The threads don't match, so queue the action
 			// and wait for it to complete.
 			ManualResetEvent wait = new ManualResetEvent(false);
-			Fiber.StartNew(() => {
+			Fiber.Factory.StartNew(() => {
 				d(state);
 				wait.Set();
 			}, scheduler);

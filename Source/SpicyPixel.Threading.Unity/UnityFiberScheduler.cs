@@ -96,6 +96,9 @@ namespace SpicyPixel.Threading
 			if(isDisposed)
 				throw new ObjectDisposedException(GetType().FullName);
 			
+            // FIXME: Coroutines are always inlined up to their
+            // first yield, so enqueuing here likely doesn't do
+            // anything other than delay a frame.
             if(AllowInlining && SchedulerThread == Thread.CurrentThread)
                 StartUnityFiber(fiber);
             else
@@ -176,7 +179,7 @@ namespace SpicyPixel.Threading
             FiberInstruction fiberInstruction = null;
             bool ranOnce = false;
 
-            while(fiber.IsAlive)
+            while(!fiber.IsCompleted)
             {
                 // If we are set to only advance one instruction then
                 // abort if we have already done that
@@ -184,28 +187,16 @@ namespace SpicyPixel.Threading
                     yield break;
                 ranOnce = true;
 
-                try
-                {	
-                    // Execute the fiber
-                    fiberInstruction = ExecuteFiber(fiber);
-        
-                    // Nothing more to do if stopped
-                    if(fiberInstruction is StopInstruction)
-                        yield break;
-	
-					// Not supported in Unity
-					if(fiberInstruction is YieldToFiber)
-						throw new InvalidOperationException("YieldToFiber is not supported by the Unity scheduler.");
-                }
-                catch(Exception ex)
-                {
-                    // Although this exception must result in the fiber
-                    // being terminated, it does not have to result in the
-                    // scheduler being brought down unless the exception
-                    // handler rethrows the exception
-                    if(!OnUnhandledException(fiber, ex))
-                        throw ex;
-                }
+                // Execute the fiber
+                fiberInstruction = ExecuteFiber(fiber);
+    
+                // Nothing more to do if stopped
+                if(fiberInstruction is StopInstruction)
+                    yield break;
+
+				// Not supported in Unity
+				if(fiberInstruction is YieldToFiber)
+					throw new InvalidOperationException("YieldToFiber is not supported by the Unity scheduler.");
     
                 // Yield to any fiber means send null to the Unity scheduler
                 if(fiberInstruction is YieldToAnyFiber)
@@ -235,49 +226,7 @@ namespace SpicyPixel.Threading
                     // Yield the coroutine that was stored when the instruction was started.
                     yield return ((YieldUntilComplete)fiberInstruction).Fiber.Properties[UnityCoroutineKey];
                     continue;
-                }
-
-#if false
-				// Note: Tests with Unity show that StartCoroutine() always executes
-				// inline and doesn't break recursion. The logic below doesn't work
-				// because fibers that aren't already queued to the scheduler will
-				// never finish executing becaues the YieldToAnyFiber case doesn't
-				// requeue. Not sure it makes sense to support this in Unity anyway
-				// since there is no easy way to remove scheduled work from the
-				// scheduler once started. Wrapped cancellation token checks might
-				// work, but the complexity isn't worth supporting.
-
-                // Yield to a fiber means run and wait for one iteration of the fiber
-                if(fiberInstruction is YieldToFiber)
-                {
-                    // If 2 fibers switch back and forth and Unity doesn't set recursion
-                    // limits for inline execution then this will eventually fail. For 
-					// now we allow a switch only 10 times before unwinding.
-                    //
-                    // Also note that StartUnityFiber() is not used here because we don't
-                    // need to track the coroutine of this execution because it will never
-                    // be waited on except here and because we need to pass some additional
-                    // parameters to ExecuteFiberInternal.
-                    if(fiberSwitchCount++ < 10)
-					{
-						Fiber yieldToFiber = ((YieldToFiber)fiberInstruction).Fiber;
-						if(yieldToFiber.FiberState != FiberState.Stopped)
-                        	yield return behaviour.StartCoroutine(ExecuteFiberInternal(yieldToFiber, true, fiberSwitchCount));
-						else
-						{
-							fiberSwitchCount = 0;
-    	                    yield return FiberInstruction.YieldToAnyFiber;
-						}
-					}
-                    else
-					{
-						fiberSwitchCount = 0;
-                        yield return FiberInstruction.YieldToAnyFiber;
-					}
-					
-					continue;
-                }
-#endif				
+                }				
             }
         }
 

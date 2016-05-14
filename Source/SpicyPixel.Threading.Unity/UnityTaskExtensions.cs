@@ -46,13 +46,25 @@ namespace SpicyPixel.Threading.Tasks
 		/// The task factory.
 		/// </returns>
 		/// <param name='behaviour'>
-		/// The MonoBehaviour.
+		/// Behaviour.
 		/// </param>
 		public static TaskFactory CreateTaskFactory(this MonoBehaviour behaviour)
 		{
 			var scheduler = new FiberTaskScheduler(new UnityFiberScheduler(behaviour));
 			return new TaskFactory(scheduler.CancellationToken, TaskCreationOptions.None, TaskContinuationOptions.None, scheduler);
 		}
+
+        /// <summary>
+        /// Creates a fiber factory using a <see cref="FiberScheduler"/>
+        /// initialized with the MonoBehaviour.
+        /// </summary>
+        /// <returns>The fiber factory.</returns>
+        /// <param name="behaviour">Behaviour.</param>
+        public static FiberFactory CreateFiberFactory(this MonoBehaviour behaviour)
+        {
+            var scheduler = new UnityFiberScheduler(behaviour);
+            return new FiberFactory(scheduler.CancellationToken, FiberContinuationOptions.None, scheduler);
+        }
 
 		/// <summary>
 		/// Creates the task scheduler.

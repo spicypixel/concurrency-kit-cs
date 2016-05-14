@@ -40,7 +40,6 @@ namespace SpicyPixel.Threading.Tasks
 	public sealed class FiberTaskScheduler : TaskScheduler, IDisposable
 	{	
         FiberScheduler scheduler;
-		CancellationTokenSource cancelSource = new CancellationTokenSource();
 		
 		/// <summary>
 		/// Gets the cancellation token set when the scheduler is destroyed.
@@ -50,7 +49,7 @@ namespace SpicyPixel.Threading.Tasks
 		/// </value>
 		public CancellationToken CancellationToken
 		{
-			get { return cancelSource.Token; }
+            get { return scheduler.CancellationToken; }
 		}
   
         /// <summary>
@@ -73,7 +72,7 @@ namespace SpicyPixel.Threading.Tasks
 		/// </remarks>
 		public FiberTaskScheduler (FiberScheduler scheduler)
 		{             
-  			this.scheduler = scheduler;			
+            this.scheduler = scheduler == null ? FiberScheduler.Current : scheduler;			
 		}
 		
 		/// <summary>
@@ -100,7 +99,7 @@ namespace SpicyPixel.Threading.Tasks
 		protected override void QueueTask (Task task)
 		{	
             // Start a fiber to run the task
-            Fiber.StartNew(ExecuteTask(task), scheduler);
+            Fiber.Factory.StartNew(ExecuteTask(task), scheduler);
 		}
 				
 		/// <summary>
@@ -205,7 +204,7 @@ namespace SpicyPixel.Threading.Tasks
 			// completed because TryExecuteTask() is what sets state.
 			var yieldableTask = task as YieldableTask;
 			if(yieldableTask != null)
-				yield return Fiber.StartNew(ExecuteYieldableTask(yieldableTask), scheduler);
+				yield return Fiber.Factory.StartNew(ExecuteYieldableTask(yieldableTask), scheduler);
 			
 			// Run the action
 			TryExecuteTask(task);
@@ -242,21 +241,31 @@ namespace SpicyPixel.Threading.Tasks
 			// This method could be removed then and the internal setters
 			// removed as well.
 			task.Fiber.Scheduler = scheduler;
-			task.Fiber.FiberState = FiberState.Running;
+			task.Fiber.Status = FiberStatus.Running;
 			
 			while(true)
 			{
 				try
 				{
-					cancelSource.Token.ThrowIfCancellationRequested();
+                    // Throw here because the scheduler is disposed and will not
+                    // run anything else. No further access is valid.
+					CancellationToken.ThrowIfCancellationRequested();
 					
 					fiberResult = task.Fiber.Execute();
 					
-					if(fiberResult is StopInstruction)
+                    if(fiberResult is StopInstruction) {
+                        // Check for exceptions
+                        if (task.Fiber.IsFaulted) {
+                            task.FiberException = task.Fiber.Exception;
+                        }
+
 						yield break;
+                    }
 				}
-				catch(Exception ex)
+                catch(System.Threading.OperationCanceledException ex)
 				{
+                    // Fiber execution does not throw so the only exception
+                    // expected is the cancellation above.
 					task.FiberException = ex;
 					yield break;
 				}
@@ -317,7 +326,7 @@ namespace SpicyPixel.Threading.Tasks
 			if(disposing) 
 			{
 				// Free other state (managed objects).
-				cancelSource.Cancel();
+                scheduler.Dispose();
 			}
 			
 			// Free your own state (unmanaged objects).

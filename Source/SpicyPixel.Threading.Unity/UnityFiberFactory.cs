@@ -25,45 +25,31 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using UnityEngine;
 
 namespace SpicyPixel.Threading
-{
+{	
 	/// <summary>
-	/// The event args passed to subscribers of unhandled fiber exception notifications.
+	/// Provides a fiber factory for Unity using the default <see cref="UnityFiberScheduler"/>.
 	/// </summary>
-	/// <seealso cref="Fiber.UnhandledException"/>
-	public sealed class FiberUnhandledExceptionEventArgs : EventArgs
+	public static class UnityFiberFactory
 	{
+		private static readonly FiberFactory instance = new FiberFactory(
+            CancellationToken.None,
+			FiberContinuationOptions.None, UnityFiberScheduler.Default);
+
 		/// <summary>
-		/// Gets the fiber that threw an exception.
+		/// Gets the shared fiber factory instance.
 		/// </summary>
-		/// <value>
-		/// The fiber.
-		/// </value>
-		public Fiber Fiber { get; private set; }
-		
-		/// <summary>
-		/// Gets the exception.
-		/// </summary>
-		/// <value>
-		/// The exception.
-		/// </value>
-		public Exception Exception { get; private set; }
-		
-		/// <summary>
-		/// Gets or sets a value indicating whether the exception
-		/// was handled and the scheduler should continue processing other fibers.
-		/// </summary>
-		/// <value>
-		/// <c>true</c> if handled; otherwise, <c>false</c>.
-		/// </value>
-		public bool Handled { get; set; } 
-		
-		internal FiberUnhandledExceptionEventArgs (Fiber fiber, Exception ex)
-		{
-			Fiber = fiber;
-			Exception = ex;
-			Handled = false;
+		/// <value>The shared fiber factory instance bound to <see cref="SpicyPixel.Threading.UnityFiberScheduler.Default"/>.</value>
+		public static FiberFactory Default {
+			get {
+				return instance;
+			}
 		}
 	}
 }
