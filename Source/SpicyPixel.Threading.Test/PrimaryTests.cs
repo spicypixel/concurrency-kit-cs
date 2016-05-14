@@ -91,7 +91,7 @@ namespace SpicyPixel.Threading.Test
         {
             Fiber.StartNew(TestFiberLetters());
             var waitOnFiber2 = Fiber.StartNew(TestFiberNumbers());
-            var mainFiber = new Fiber(() => waitOnFiber2);
+            var mainFiber = new Fiber(() => new YieldUntilComplete(waitOnFiber2));
             FiberScheduler.Current.Run(mainFiber); 
         }
 
@@ -362,12 +362,12 @@ namespace SpicyPixel.Threading.Test
             waitAllTokens.Clear();
 
             var fibers = new Fiber[] {
-                Fiber.StartNew(WaitRandomTimeCoroutine(0)).Fiber,
-                Fiber.StartNew(WaitRandomTimeCoroutine(1)).Fiber,
-                Fiber.StartNew(WaitRandomTimeCoroutine(2)).Fiber,
-                Fiber.StartNew(WaitRandomTimeCoroutine(3)).Fiber,
-                Fiber.StartNew(WaitRandomTimeCoroutine(4)).Fiber,
-                Fiber.StartNew(WaitRandomTimeCoroutine(5)).Fiber
+                Fiber.StartNew(WaitRandomTimeCoroutine(0)),
+                Fiber.StartNew(WaitRandomTimeCoroutine(1)),
+                Fiber.StartNew(WaitRandomTimeCoroutine(2)),
+                Fiber.StartNew(WaitRandomTimeCoroutine(3)),
+                Fiber.StartNew(WaitRandomTimeCoroutine(4)),
+                Fiber.StartNew(WaitRandomTimeCoroutine(5))
             };
 
             FiberScheduler.Current.Run(new Fiber(TestWaitAllVerifyRunToStop(fibers)));
@@ -385,8 +385,8 @@ namespace SpicyPixel.Threading.Test
                 Assert.AreEqual(FiberState.Stopped, fiber.FiberState, "Fiber was still running and should have been stopped");
 
             // Result should be true
-            Assert.IsNotNull(waitAllFiber.Fiber.ResultAsObject, "Result should not be null");
-            Assert.IsTrue((bool)waitAllFiber.Fiber.ResultAsObject, "Result should have been true");
+            Assert.IsNotNull(waitAllFiber.ResultAsObject, "Result should not be null");
+            Assert.IsTrue((bool)waitAllFiber.ResultAsObject, "Result should have been true");
         }
 
         IEnumerator WaitRandomTimeCoroutine(int token)
@@ -399,12 +399,12 @@ namespace SpicyPixel.Threading.Test
         public void TestWaitAllTimeout()
         {
             var fibers = new Fiber[] {
-                Fiber.StartNew(() => new YieldForSeconds(3f)).Fiber,
-                Fiber.StartNew(() => new YieldForSeconds(3f)).Fiber,
-                Fiber.StartNew(() => new YieldForSeconds(3f)).Fiber,
-                Fiber.StartNew(() => new YieldForSeconds(3f)).Fiber,
-                Fiber.StartNew(() => new YieldForSeconds(3f)).Fiber,
-                Fiber.StartNew(() => new YieldForSeconds(3f)).Fiber
+                Fiber.StartNew(() => new YieldForSeconds(3f)),
+                Fiber.StartNew(() => new YieldForSeconds(3f)),
+                Fiber.StartNew(() => new YieldForSeconds(3f)),
+                Fiber.StartNew(() => new YieldForSeconds(3f)),
+                Fiber.StartNew(() => new YieldForSeconds(3f)),
+                Fiber.StartNew(() => new YieldForSeconds(3f))
             };
 
             FiberScheduler.Current.Run(new Fiber(TestWaitAllVerifyTimeout(fibers)));
@@ -426,20 +426,20 @@ namespace SpicyPixel.Threading.Test
             Assert.IsFalse(fibers.Any(f => f.FiberState == FiberState.Running), "No fibers should have been running");
 
             // Result should be false
-            Assert.IsNotNull(waitAllFiber.Fiber.ResultAsObject, "Result should not be null");
-            Assert.IsFalse((bool)waitAllFiber.Fiber.ResultAsObject, "Result should have been false");
+            Assert.IsNotNull(waitAllFiber.ResultAsObject, "Result should not be null");
+            Assert.IsFalse((bool)waitAllFiber.ResultAsObject, "Result should have been false");
         }
 
         [Test()]
         public void TestWaitAllCancellation()
         {
             var fibers = new Fiber[] {
-                Fiber.StartNew(() => new YieldForSeconds(3f)).Fiber,
-                Fiber.StartNew(() => new YieldForSeconds(3f)).Fiber,
-                Fiber.StartNew(() => new YieldForSeconds(3f)).Fiber,
-                Fiber.StartNew(() => new YieldForSeconds(3f)).Fiber,
-                Fiber.StartNew(() => new YieldForSeconds(3f)).Fiber,
-                Fiber.StartNew(() => new YieldForSeconds(3f)).Fiber
+                Fiber.StartNew(() => new YieldForSeconds(3f)),
+                Fiber.StartNew(() => new YieldForSeconds(3f)),
+                Fiber.StartNew(() => new YieldForSeconds(3f)),
+                Fiber.StartNew(() => new YieldForSeconds(3f)),
+                Fiber.StartNew(() => new YieldForSeconds(3f)),
+                Fiber.StartNew(() => new YieldForSeconds(3f))
             };
 
             FiberScheduler.Current.Run(new Fiber(TestWaitAllVerifyCancellation(fibers)));
@@ -464,8 +464,8 @@ namespace SpicyPixel.Threading.Test
             Assert.IsFalse(fibers.Any(f => f.FiberState == FiberState.Running), "No fibers should have been running");
 
             // Result should be false
-            Assert.IsNotNull(waitAllFiber.Fiber.ResultAsObject, "Result should not be null");
-            Assert.IsFalse((bool)waitAllFiber.Fiber.ResultAsObject, "Result should have been false");
+            Assert.IsNotNull(waitAllFiber.ResultAsObject, "Result should not be null");
+            Assert.IsFalse((bool)waitAllFiber.ResultAsObject, "Result should have been false");
         }
     }
 }

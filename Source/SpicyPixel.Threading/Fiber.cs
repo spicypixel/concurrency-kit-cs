@@ -144,22 +144,24 @@ namespace SpicyPixel.Threading
 		/// Start executing a new fiber using the default scheduler on the thread.
 		/// </summary>
 		/// <returns>
-		/// Returns a <see cref="YieldUntilComplete"/> fiber instruction
+		/// Returns a <see cref="Fiber"/>
 		/// that can be yielded against to wait for the fiber to complete.
 		/// </returns>
 		/// <param name='coroutine'>
 		/// A couroutine to execute on the fiber.
 		/// </param>
-		public static YieldUntilComplete StartNew(IEnumerator coroutine)
+		public static Fiber StartNew(IEnumerator coroutine)
 		{
-			return new Fiber(coroutine).Start();
+			var fiber = new Fiber(coroutine);
+			fiber.Start();
+			return fiber;
 		}
 		
 		/// <summary>
 		/// Start executing a new fiber using the specified scheduler.
 		/// </summary>
 		/// <returns>
-		/// Returns a <see cref="YieldUntilComplete"/> fiber instruction
+		/// Returns a <see cref="Fiber"/>
 		/// that can be yielded against to wait for the fiber to complete.
 		/// </returns>
 		/// <param name='coroutine'>
@@ -168,31 +170,35 @@ namespace SpicyPixel.Threading
 		/// <param name='scheduler'>
 		/// A scheduler to execute the fiber on.
 		/// </param>
-		public static YieldUntilComplete StartNew(IEnumerator coroutine, FiberScheduler scheduler)
+		public static Fiber StartNew(IEnumerator coroutine, FiberScheduler scheduler)
 		{
-			return new Fiber(coroutine).Start(scheduler);
+			var fiber = new Fiber(coroutine);
+			fiber.Start(scheduler);
+			return fiber;
 		}
 		
 		/// <summary>
 		/// Start executing a new fiber using the default scheduler on the thread.
 		/// </summary>
 		/// <returns>
-		/// Returns a <see cref="YieldUntilComplete"/> fiber instruction
+		/// Returns a <see cref="Fiber"/>
 		/// that can be yielded against to wait for the fiber to complete.
 		/// </returns>
 		/// <param name='action'>
 		/// A non-blocking action to execute on the fiber.
 		/// </param>
-		public static YieldUntilComplete StartNew(Action action)
+		public static Fiber StartNew(Action action)
 		{
-			return new Fiber(action).Start();
+			var fiber = new Fiber(action);
+			fiber.Start();
+			return fiber;
 		}
 		
 		/// <summary>
 		/// Start executing a new fiber using the default scheduler on the thread.
 		/// </summary>
 		/// <returns>
-		/// Returns a <see cref="YieldUntilComplete"/> fiber instruction
+		/// Returns a <see cref="Fiber"/>
 		/// that can be yielded against to wait for the fiber to complete.
 		/// </returns>
 		/// <param name='action'>
@@ -201,16 +207,18 @@ namespace SpicyPixel.Threading
 		/// <param name='scheduler'>
 		/// A scheduler to execute the fiber on.
 		/// </param>
-		public static YieldUntilComplete StartNew(Action action, FiberScheduler scheduler)
+		public static Fiber StartNew(Action action, FiberScheduler scheduler)
 		{
-			return new Fiber(action).Start(scheduler);
+			var fiber = new Fiber(action);
+			fiber.Start(scheduler);
+			return fiber;
 		}
 
         /// <summary>
         /// Start executing a new fiber using the default scheduler on the thread.
         /// </summary>
         /// <returns>
-        /// Returns a <see cref="YieldUntilComplete"/> fiber instruction
+        /// Returns a <see cref="Fiber"/>
         /// that can be yielded against to wait for the fiber to complete.
         /// </returns>
         /// <param name='action'>
@@ -219,16 +227,18 @@ namespace SpicyPixel.Threading
         /// <param name='state'>
         /// State to pass to the action.
         /// </param>
-        public static YieldUntilComplete StartNew(Action<object> action, object state)
+        public static Fiber StartNew(Action<object> action, object state)
         {
-            return new Fiber(action, state).Start();
+            var fiber = new Fiber(action, state);
+			fiber.Start();
+			return fiber;
         }
         
         /// <summary>
         /// Start executing a new fiber using the default scheduler on the thread.
         /// </summary>
         /// <returns>
-        /// Returns a <see cref="YieldUntilComplete"/> fiber instruction
+        /// Returns a <see cref="Fiber"/>
         /// that can be yielded against to wait for the fiber to complete.
         /// </returns>
         /// <param name='action'>
@@ -240,55 +250,63 @@ namespace SpicyPixel.Threading
         /// <param name='state'>
         /// State to pass to the action.
         /// </param>
-        public static YieldUntilComplete StartNew(Action<object> action, object state, FiberScheduler scheduler)
+        public static Fiber StartNew(Action<object> action, object state, FiberScheduler scheduler)
         {
-            return new Fiber(action, state).Start(scheduler);
+			var fiber = new Fiber(action, state);
+			fiber.Start(scheduler);
+			return fiber;
         }
 		
 		/// <summary>
 		/// Initializes a new instance of the <see cref="SpicyPixel.Threading.Fiber"/> class.
 		/// </summary>
 		/// <param name='func'>
-		/// A non-blocking function that returns a <see cref="FiberInstruction"/> when complete.
+		/// A non-blocking function that returns a <see cref="Fiber"/> when complete.
 		/// </param>
-		public static YieldUntilComplete StartNew(Func<FiberInstruction> func)
+		public static Fiber StartNew(Func<FiberInstruction> func)
 		{
-			return new Fiber(func).Start();
+			var fiber = new Fiber(func);
+			fiber.Start();
+			return fiber;
 		}
 		
 		/// <summary>
 		/// Initializes a new instance of the <see cref="SpicyPixel.Threading.Fiber"/> class.
 		/// </summary>
 		/// <param name='func'>
-		/// A non-blocking function that returns a <see cref="FiberInstruction"/> when complete.
+		/// A non-blocking function that returns a <see cref="Fiber"/> when complete.
 		/// </param>
 		/// <param name='state'>
 		/// State to pass to the function.
 		/// </param>
-		public static YieldUntilComplete StartNew(Func<object, FiberInstruction> func, object state)
+		public static Fiber StartNew(Func<object, FiberInstruction> func, object state)
 		{
-			return new Fiber(func, state).Start();
+			var fiber = new Fiber(func, state);
+			fiber.Start();
+			return fiber;
 		}
 		
 		/// <summary>
 		/// Initializes a new instance of the <see cref="SpicyPixel.Threading.Fiber"/> class.
 		/// </summary>
 		/// <param name='func'>
-		/// A non-blocking function that returns a <see cref="FiberInstruction"/> when complete.
+		/// A non-blocking function that returns a <see cref="Fiber"/> when complete.
 		/// </param>
 		/// <param name='scheduler'>
         /// A scheduler to execute the fiber on.
         /// </param>
-		public static YieldUntilComplete StartNew(Func<FiberInstruction> func, FiberScheduler scheduler)
+		public static Fiber StartNew(Func<FiberInstruction> func, FiberScheduler scheduler)
 		{
-			return new Fiber(func).Start(scheduler);
+			var fiber = new Fiber(func);
+			fiber.Start(scheduler);
+			return fiber;
 		}
 		
 		/// <summary>
 		/// Initializes a new instance of the <see cref="SpicyPixel.Threading.Fiber"/> class.
 		/// </summary>
 		/// <param name='func'>
-		/// A non-blocking function that returns a <see cref="FiberInstruction"/> when complete.
+		/// A non-blocking function that returns a <see cref="Fiber"/> when complete.
 		/// </param>
 		/// <param name='state'>
 		/// State to pass to the function.
@@ -296,32 +314,64 @@ namespace SpicyPixel.Threading
 		/// <param name='scheduler'>
         /// A scheduler to execute the fiber on.
         /// </param>
-		public static YieldUntilComplete StartNew(Func<object, FiberInstruction> func, object state, FiberScheduler scheduler)
+		public static Fiber StartNew(Func<object, FiberInstruction> func, object state, FiberScheduler scheduler)
 		{
-			return new Fiber(func, state).Start(scheduler);
+			var fiber = new Fiber(func, state);
+			fiber.Start(scheduler);
+			return fiber;
 		}
 
-		public static YieldUntilComplete WaitAll (params Fiber[] fibers)
+		/// <summary>
+		/// Returns a fiber that waits on all fibers to complete.
+		/// </summary>
+		/// <returns>A fiber that waits on all fibers to complete.</returns>
+		/// <param name="fibers">Fibers to wait for completion.</param>
+		public static Fiber WaitAll (params Fiber[] fibers)
 		{
 			return WaitAll (fibers, Timeout.Infinite, CancellationToken.None);
 		}
 
-		public static YieldUntilComplete WaitAll (Fiber[] fibers, CancellationToken cancellationToken)
+		/// <summary>
+		/// Returns a fiber that waits on all fibers to complete.
+		/// </summary>
+		/// <returns>A fiber that waits on all fibers to complete.</returns>
+		/// <param name="fibers">Fibers to wait for completion.</param>
+		/// <param name="cancellationToken">Cancellation token.</param>
+		public static Fiber WaitAll (Fiber[] fibers, CancellationToken cancellationToken)
 		{
 			return WaitAll (fibers, Timeout.Infinite, cancellationToken);
 		}
 
-		public static YieldUntilComplete WaitAll (Fiber[] fibers, TimeSpan timeout)
+		/// <summary>
+		/// Returns a fiber that waits on all fibers to complete.
+		/// </summary>
+		/// <returns>A fiber that waits on all fibers to complete.</returns>
+		/// <param name="fibers">Fibers to wait for completion.</param>
+		/// <param name="timeout">Timeout.</param>
+		public static Fiber WaitAll (Fiber[] fibers, TimeSpan timeout)
 		{
 			return WaitAll (fibers, CheckTimeout (timeout), CancellationToken.None);
 		}
 
-		public static YieldUntilComplete WaitAll (Fiber[] fibers, int millisecondsTimeout)
+		/// <summary>
+		/// Returns a fiber that waits on all fibers to complete.
+		/// </summary>
+		/// <returns>A fiber that waits on all fibers to complete.</returns>
+		/// <param name="fibers">Fibers to wait for completion.</param>
+		/// <param name="millisecondsTimeout">Milliseconds timeout.</param>
+		public static Fiber WaitAll (Fiber[] fibers, int millisecondsTimeout)
 		{
 			return WaitAll (fibers, millisecondsTimeout, CancellationToken.None);
 		}
 
-		public static YieldUntilComplete WaitAll (Fiber[] fibers, int millisecondsTimeout, CancellationToken cancellationToken)
+		/// <summary>
+		/// Returns a fiber that waits on all fibers to complete.
+		/// </summary>
+		/// <returns>A fiber that waits on all fibers to complete.</returns>
+		/// <param name="fibers">Fibers to wait for completion.</param>
+		/// <param name="millisecondsTimeout">Milliseconds timeout.</param>
+		/// <param name="cancellationToken">Cancellation token.</param>
+		public static Fiber WaitAll (Fiber[] fibers, int millisecondsTimeout, CancellationToken cancellationToken)
 		{
 			if (fibers == null)
 				throw new ArgumentNullException ("fibers");
@@ -525,13 +575,9 @@ namespace SpicyPixel.Threading
 		/// <summary>
 		/// Start executing the fiber using the default scheduler on the thread.
 		/// </summary>
-		/// <returns>
-		/// Returns a <see cref="YieldUntilComplete"/> fiber instruction
-		/// that can be yielded against to wait for the fiber to complete.
-		/// </returns>
-		public YieldUntilComplete Start()
+		public void Start()
 		{
-			return Start(FiberScheduler.Current);
+			Start(FiberScheduler.Current);
 		}
 				
 		/// <summary>
@@ -541,14 +587,10 @@ namespace SpicyPixel.Threading
 		/// This method is safe to call from any thread even if different
 		/// than the scheduler execution thread.
 		/// </remarks>
-		/// <returns>
-		/// Returns a <see cref="YieldUntilComplete"/> fiber instruction
-		/// that can be yielded against to wait for the fiber to complete.
-		/// </returns>
 		/// <param name='scheduler'>
 		/// The scheduler to start the fiber on.
 		/// </param>
-		public YieldUntilComplete Start(FiberScheduler scheduler)
+		public void Start(FiberScheduler scheduler)
 		{	
 			// It would be unusual to attempt to start a Fiber more than once,
 			// but to be safe and to support calling from any thread
@@ -561,7 +603,6 @@ namespace SpicyPixel.Threading
 			
 			this.scheduler = scheduler;
 			((IFiberScheduler)this.scheduler).QueueFiber(this);
-			return new YieldUntilComplete(this);
 		}
 		
 		/// <summary>
@@ -762,9 +803,16 @@ namespace SpicyPixel.Threading
 							result = null;
 							continue;
 						}
-
-						// Pass through other values
-	                    return new ObjectInstruction(result);
+						else if (result is Fiber)
+						{
+							// Convert fibers into yield instructions
+							instruction = new YieldUntilComplete(result as Fiber);
+						}
+						else
+						{
+							// Pass through other values
+	                    	return new ObjectInstruction(result);
+						}
 					}
 
 					if (instruction is FiberResult)

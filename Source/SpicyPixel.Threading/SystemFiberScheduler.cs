@@ -456,7 +456,7 @@ namespace SpicyPixel.Threading
 			return true;
 		}
 		
-		private IEnumerator CancelWhenComplete(YieldUntilComplete waitOnFiber, CancellationTokenSource cancelSource)
+		private IEnumerator CancelWhenComplete(Fiber waitOnFiber, CancellationTokenSource cancelSource)
 		{
 			yield return waitOnFiber;
 			cancelSource.Cancel();
@@ -525,15 +525,12 @@ namespace SpicyPixel.Threading
 					waitHandleList.Add(mainFiberCompleteCancelSource.Token.WaitHandle);
 
 					// Start the main fiber if it isn't running yet
-					YieldUntilComplete waitOnFiber;				
 					if(fiber.FiberState == FiberState.Unstarted)
-						waitOnFiber = fiber.Start(this);
-					else
-						waitOnFiber = new YieldUntilComplete(fiber);
+						fiber.Start(this);
 					
 					// Start another fiber that waits on the main fiber to complete.
 					// When it does, it raises a cancellation.
-					Fiber.StartNew(CancelWhenComplete(waitOnFiber, mainFiberCompleteCancelSource), this);
+					Fiber.StartNew(CancelWhenComplete(fiber, mainFiberCompleteCancelSource), this);
 				}
 				
 				WaitHandle[] waitHandles = waitHandleList.ToArray();
