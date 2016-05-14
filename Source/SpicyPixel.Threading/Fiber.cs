@@ -876,6 +876,14 @@ namespace SpicyPixel.Threading
 						if(nestedCoroutine.MoveNext())
 						{
 							result = nestedCoroutine.Current;
+
+							// A stop instruction in a nested coroutine
+							// means stop that execution, not the parent
+							if (result is StopInstruction)
+							{
+								nestedCoroutines.Pop();
+								continue;
+							}
 						}
 						else
 						{
@@ -891,6 +899,11 @@ namespace SpicyPixel.Threading
 						{
 							// Get result of execution
 							result = coroutine.Current;
+
+							// If the coroutine returned a stop directly
+							// the fiber still needs to process it
+							if (result is StopInstruction)
+								Stop();
 						}
 						else
 						{
