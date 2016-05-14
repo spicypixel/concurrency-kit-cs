@@ -413,10 +413,57 @@ namespace SpicyPixel.Threading
 					yield return new FiberResult(false);
 				}
 
-				// TODO: Handle abort?
+				// TODO: Handle abort or exception?
 				if (fibers.All(f => f.FiberState == FiberState.Stopped)) {
-					Fiber.CurrentFiber.ResultAsObject = true;
 					yield return new FiberResult(true);
+				}
+
+				yield return FiberInstruction.YieldToAnyFiber;
+			}
+		}
+
+		/// <summary>
+		/// Returns a fiber that completes when any fiber finishes.
+		/// </summary>
+		/// <returns>A fiber that completes when any fiber finishes.</returns>
+		/// <remarks>
+		/// `Fiber.ResultAsObject` will be the `Fiber` that completed.
+		/// </remarks>
+		/// <param name="fibers">Fibers to wait for completion.</param>
+		public static Fiber WhenAny (params Fiber[] fibers)
+		{
+			return WhenAny(fibers.AsEnumerable());
+		}
+
+		/// <summary>
+		/// Returns a fiber that completes when any fiber finishes.
+		/// </summary>
+		/// <returns>A fiber that completes when any fiber finishes.</returns>
+		/// <remarks>
+		/// `Fiber.ResultAsObject` will be the `Fiber` that completed.
+		/// </remarks>
+		/// <param name="fibers">Fibers to wait for completion.</param>
+		public static Fiber WhenAny (IEnumerable<Fiber> fibers)
+		{
+			if (fibers == null)
+				throw new ArgumentNullException ("fibers");
+
+			foreach (var fiber in fibers) {
+				if (fiber == null)
+					throw new ArgumentException ("fibers", "the fibers argument contains a null element");				
+			}
+
+			return Fiber.StartNew(WhenAnyCoroutine(fibers));
+		}
+
+		static IEnumerator WhenAnyCoroutine(IEnumerable<Fiber> fibers)
+		{
+			while (true) {
+				// TODO: Handle abort or exception?
+				var fiber = fibers.FirstOrDefault(f => f.FiberState == FiberState.Stopped);
+
+				if (fiber != null) {
+					yield return new FiberResult(fiber);
 				}
 
 				yield return FiberInstruction.YieldToAnyFiber;

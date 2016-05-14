@@ -467,6 +467,41 @@ namespace SpicyPixel.Threading.Test
             Assert.IsNotNull(waitAllFiber.ResultAsObject, "Result should not be null");
             Assert.IsFalse((bool)waitAllFiber.ResultAsObject, "Result should have been false");
         }
+
+        [Test()]
+        public void TestWhenAny()
+        {
+            var fibers = new Fiber[] {
+                Fiber.StartNew(() => new YieldForSeconds(1.5f)),
+                Fiber.StartNew(() => new YieldForSeconds(1.6f)),
+                Fiber.StartNew(() => new YieldForSeconds(1f)),
+                Fiber.StartNew(() => new YieldForSeconds(1.8f)),
+                Fiber.StartNew(() => new YieldForSeconds(1.9f)),
+                Fiber.StartNew(() => new YieldForSeconds(1.4f))
+            };
+
+            FiberScheduler.Current.Run(new Fiber(TestWhenAnyCoroutine(fibers)));
+        }
+
+        IEnumerator TestWhenAnyCoroutine(Fiber[] fibers)
+        {
+            // Wait
+            var waitAllFiber = Fiber.WhenAny(fibers);
+            yield return waitAllFiber;
+
+            // Verify index 2 was the winner and is done
+            Assert.AreEqual(fibers[2], waitAllFiber.ResultAsObject, "Fiber at index 2 was not the winner and should be");
+            Assert.IsTrue(fibers[2].FiberState == FiberState.Stopped, "Fiber at index 2 should have been stopped");
+
+            // Others should still be running
+            Assert.IsTrue(fibers.Any(f => f.FiberState == FiberState.Running), "Other fibers should have been running but were not");
+
+            // Wait 2s more
+            yield return new YieldForSeconds(2);
+
+            // Now none should be running
+            Assert.IsFalse(fibers.Any(f => f.FiberState == FiberState.Running), "No fibers should have been running");
+        }
     }
 }
 
