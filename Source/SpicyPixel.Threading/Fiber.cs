@@ -560,6 +560,49 @@ namespace SpicyPixel.Threading
 			}
 		}
 
+		public static Fiber Delay (int millisecondsDelay)
+		{
+			return Delay (millisecondsDelay, CancellationToken.None);
+		}
+
+		public static Fiber Delay (TimeSpan delay)
+		{
+			return Delay (CheckTimeout (delay), CancellationToken.None);
+		}
+
+		public static Fiber Delay (TimeSpan delay, CancellationToken cancellationToken)
+		{
+			return Delay (CheckTimeout (delay), cancellationToken);
+		}
+
+		public static Fiber Delay (int millisecondsDelay, CancellationToken cancellationToken)
+		{
+			if (millisecondsDelay < -1)
+				throw new ArgumentOutOfRangeException ("millisecondsDelay");
+
+			return Fiber.StartNew(DelayCoroutine(millisecondsDelay, cancellationToken));
+		}
+
+		static IEnumerator DelayCoroutine(int millisecondsDelay, CancellationToken cancellationToken)
+		{
+			var startWait = DateTime.Now;
+			while (true) {
+				if (cancellationToken.IsCancellationRequested) {
+					yield return FiberInstruction.Stop;
+				}
+
+				// Infinite delay doesn't end until cancel
+				if (millisecondsDelay == Timeout.Infinite) {
+					yield return FiberInstruction.YieldToAnyFiber;
+				} else {
+					// FIXME: Cancellation isn't honored. Fiber should have CancellationToken
+					// that the scheduler can use to wake.
+					yield return new YieldForSeconds((float)millisecondsDelay / 1000f);
+					yield break;
+				}
+			}
+		}
+
         /// <summary>
         /// Gets user-defined properties associated with the fiber.
         /// </summary>
