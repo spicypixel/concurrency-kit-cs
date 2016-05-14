@@ -84,7 +84,7 @@ namespace SpicyPixel.Threading
 		private static int nextId = 0;
 		
 		private IEnumerator coroutine;
-		private Stack<IEnumerator> nestedCoroutines = new Stack<IEnumerator>();
+		private Stack<IEnumerator> nestedCoroutines;
 		
 		private Action action;
         private Action<object> actionObject;
@@ -933,7 +933,7 @@ namespace SpicyPixel.Threading
 						throw new FiberAbortException();
 
 					// Execute the coroutine or action
-					if(nestedCoroutines.Count > 0)
+					if(nestedCoroutines != null && nestedCoroutines.Count > 0)
 					{
 						var nestedCoroutine = nestedCoroutines.Peek();
 						if(nestedCoroutine.MoveNext())
@@ -1019,6 +1019,10 @@ namespace SpicyPixel.Threading
 						// If the result was an enumerator there is a nested coroutine to execute
 						if (result is IEnumerator)
 						{
+							// Lazy create
+							if (nestedCoroutines == null)
+								nestedCoroutines = new Stack<IEnumerator>();
+							
 							// Push the nested coroutine onto the stack
 							nestedCoroutines.Push(result as IEnumerator);
 
