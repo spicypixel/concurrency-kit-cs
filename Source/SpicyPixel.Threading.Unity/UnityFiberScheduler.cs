@@ -39,7 +39,7 @@ namespace SpicyPixel.Threading
     /// </summary>
 	public sealed class UnityFiberScheduler : FiberScheduler
 	{	
-        private const string UnityCoroutineKey = "spicypixel.threading.unity.coroutine";
+        internal const string UnityCoroutineKey = "spicypixel.threading.unity.coroutine";
 
 		private static readonly UnityFiberScheduler instance = new UnityFiberScheduler(ConcurrentBehaviour.SharedInstance);
 
