@@ -502,6 +502,14 @@ namespace SpicyPixel.Threading.Test
             // Now none should be running
             Assert.IsFalse(fibers.Any(f => f.FiberState == FiberState.Running), "No fibers should have been running");
         }
+
+        [Test()]
+        public void TestDelay()
+        {
+            var startTime = DateTime.Now;
+            FiberScheduler.Current.Run(Fiber.Delay(2000));
+            Assert.GreaterOrEqual(DateTime.Now, startTime + TimeSpan.FromSeconds(2));
+        }
     }
 }
 
