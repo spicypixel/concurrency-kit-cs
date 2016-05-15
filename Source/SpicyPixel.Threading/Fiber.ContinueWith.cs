@@ -70,12 +70,19 @@ namespace SpicyPixel.Threading
             var fiber = new Fiber(continuationCoroutine, cancellationToken);
 
             fiber.antecedent = this;
+            fiber.status = (int)FiberStatus.WaitingForActivation;
 
-            // Lazy create queue
-            if (continuations == null)
-                continuations = new Queue<FiberContinuation>();
+            var continuation = new FiberContinuation(fiber, continuationOptions, scheduler);
 
-            continuations.Enqueue(new FiberContinuation(fiber, continuationOptions, scheduler));
+            if (IsCompleted) {
+                continuation.Execute();    
+            } else {
+                // Lazy create queue
+                if (continuations == null)
+                    continuations = new Queue<FiberContinuation>();
+
+                continuations.Enqueue(continuation);
+            }
 
             return fiber;
         }
@@ -206,12 +213,19 @@ namespace SpicyPixel.Threading
                             state, cancellationToken);
             
             fiber.antecedent = this;
+            fiber.status = (int)FiberStatus.WaitingForActivation;
 
-            // Lazy create queue
-            if (continuations == null)
-                continuations = new Queue<FiberContinuation>();
+            var continuation = new FiberContinuation(fiber, continuationOptions, scheduler);
 
-            continuations.Enqueue(new FiberContinuation(fiber, continuationOptions, scheduler));
+            if (IsCompleted) {
+                continuation.Execute();    
+            } else {
+                // Lazy create queue
+                if (continuations == null)
+                    continuations = new Queue<FiberContinuation>();
+
+                continuations.Enqueue(continuation);
+            }
 
             return fiber;
         }

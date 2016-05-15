@@ -462,9 +462,12 @@ namespace SpicyPixel.Threading
             // use Interlocked with boxing on the enum.
 			
             var originalState = (FiberStatus)Interlocked.CompareExchange(ref status, (int)FiberStatus.WaitingToRun, (int)FiberStatus.Created);
-				
-            if (originalState != FiberStatus.Created)
-                throw new InvalidOperationException("A fiber cannot be started again once it has begun running or has completed.");
+            if (originalState != FiberStatus.Created) {
+                originalState = (FiberStatus)Interlocked.CompareExchange(ref status, (int)FiberStatus.WaitingToRun, (int)FiberStatus.WaitingForActivation);
+                if (originalState != FiberStatus.WaitingForActivation) {
+                    throw new InvalidOperationException("A fiber cannot be started again once it has begun running or has completed.");
+                }
+            }
 			
             this.scheduler = scheduler;
             ((IFiberScheduler)this.scheduler).QueueFiber(this);
