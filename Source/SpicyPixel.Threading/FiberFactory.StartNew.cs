@@ -34,9 +34,7 @@ namespace SpicyPixel.Threading
         /// <param name="cancellationToken">Cancellation token.</param>
         public Fiber StartNew(IEnumerator coroutine, CancellationToken cancellationToken)
         {
-            var fiber = new Fiber(coroutine, cancellationToken);
-            fiber.Start(GetScheduler());
-            return fiber;
+            return StartNew(coroutine, cancellationToken, GetScheduler());
         }
 
         /// <summary>
@@ -106,9 +104,7 @@ namespace SpicyPixel.Threading
         /// <param name="cancellationToken">Cancellation token.</param>
         public Fiber StartNew(Action action, CancellationToken cancellationToken)
         {
-            var fiber = new Fiber(action, cancellationToken);
-            fiber.Start(GetScheduler());
-            return fiber;
+            return StartNew(action, cancellationToken, GetScheduler());
         }
 
         /// <summary>
@@ -184,9 +180,7 @@ namespace SpicyPixel.Threading
         /// <param name="cancellationToken">Cancellation token.</param>
         public Fiber StartNew(Action<object> action, object state, CancellationToken cancellationToken)
         {
-            var fiber = new Fiber(action, state, cancellationToken);
-            fiber.Start(GetScheduler());
-            return fiber;
+            return StartNew(action, state, cancellationToken, GetScheduler());
         }
 
         /// <summary>
@@ -254,40 +248,7 @@ namespace SpicyPixel.Threading
         /// <param name="cancellationToken">Cancellation token.</param>
         public Fiber StartNew(Func<FiberInstruction> func, CancellationToken cancellationToken)
         {
-            var fiber = new Fiber(func, cancellationToken);
-            fiber.Start(GetScheduler());
-            return fiber;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SpicyPixel.Threading.Fiber"/> class.
-        /// </summary>
-        /// <param name='func'>
-        /// A non-blocking function that returns a <see cref="Fiber"/> when complete.
-        /// </param>
-        /// <param name='state'>
-        /// State to pass to the function.
-        /// </param>
-        public Fiber StartNew(Func<object, FiberInstruction> func, object state)
-        {
-            return StartNew(func, state, cancellationToken);
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SpicyPixel.Threading.Fiber"/> class.
-        /// </summary>
-        /// <param name='func'>
-        /// A non-blocking function that returns a <see cref="Fiber"/> when complete.
-        /// </param>
-        /// <param name='state'>
-        /// State to pass to the function.
-        /// </param>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        public Fiber StartNew(Func<object, FiberInstruction> func, object state, CancellationToken cancellationToken)
-        {
-            var fiber = new Fiber(func, state, cancellationToken);
-            fiber.Start(GetScheduler());
-            return fiber;
+            return StartNew(func, cancellationToken, GetScheduler());
         }
 
         /// <summary>
@@ -330,6 +291,35 @@ namespace SpicyPixel.Threading
         /// <param name='state'>
         /// State to pass to the function.
         /// </param>
+        public Fiber StartNew(Func<object, FiberInstruction> func, object state)
+        {
+            return StartNew(func, state, cancellationToken);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SpicyPixel.Threading.Fiber"/> class.
+        /// </summary>
+        /// <param name='func'>
+        /// A non-blocking function that returns a <see cref="Fiber"/> when complete.
+        /// </param>
+        /// <param name='state'>
+        /// State to pass to the function.
+        /// </param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        public Fiber StartNew(Func<object, FiberInstruction> func, object state, CancellationToken cancellationToken)
+        {
+            return StartNew(func, state, cancellationToken, GetScheduler());
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SpicyPixel.Threading.Fiber"/> class.
+        /// </summary>
+        /// <param name='func'>
+        /// A non-blocking function that returns a <see cref="Fiber"/> when complete.
+        /// </param>
+        /// <param name='state'>
+        /// State to pass to the function.
+        /// </param>
         /// <param name='scheduler'>
         /// A scheduler to execute the fiber on.
         /// </param>
@@ -360,7 +350,7 @@ namespace SpicyPixel.Threading
 
         FiberScheduler GetScheduler()
         {
-            return scheduler == null ? FiberScheduler.Current : scheduler;
+            return scheduler ?? FiberScheduler.Current;
         }
     }
 }
