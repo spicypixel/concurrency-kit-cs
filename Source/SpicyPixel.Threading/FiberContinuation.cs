@@ -4,15 +4,15 @@ namespace SpicyPixel.Threading
 {
     class FiberContinuation
     {
-        public Fiber Fiber;
-        public FiberContinuationOptions Options;
-        public FiberScheduler Scheduler;
+        Fiber fiber;
+        FiberContinuationOptions options;
+        FiberScheduler scheduler;
 
         public FiberContinuation(Fiber fiber, FiberContinuationOptions options, FiberScheduler scheduler)
         {
-            this.Fiber = fiber;
-            this.Options = options;
-            this.Scheduler = scheduler;
+            this.fiber = fiber;
+            this.options = options;
+            this.scheduler = scheduler;
         }
 
         bool ContinuationStateCheck (FiberContinuationOptions options)
@@ -20,25 +20,25 @@ namespace SpicyPixel.Threading
             if (options == FiberContinuationOptions.None)
                 return true;
 
-            int kindCode = (int) options;
-            var state = Fiber.antecedent.Status;
+            int optionCode = (int) options;
+            var status = fiber.antecedent.Status;
 
-            if (kindCode >= ((int) FiberContinuationOptions.NotOnRanToCompletion)) {
-                if (state == FiberStatus.Canceled) {
+            if (optionCode >= ((int) FiberContinuationOptions.NotOnRanToCompletion)) {
+                if (status == FiberStatus.Canceled) {
                     if (options == FiberContinuationOptions.NotOnCanceled)
                         return false;
                     if (options == FiberContinuationOptions.OnlyOnFaulted)
                         return false;
                     if (options == FiberContinuationOptions.OnlyOnRanToCompletion)
                         return false;
-                } else if (state == FiberStatus.Faulted) {
+                } else if (status == FiberStatus.Faulted) {
                     if (options == FiberContinuationOptions.NotOnFaulted)
                         return false;
                     if (options == FiberContinuationOptions.OnlyOnCanceled)
                         return false;
                     if (options == FiberContinuationOptions.OnlyOnRanToCompletion)
                         return false;
-                } else if (state == FiberStatus.RanToCompletion) {
+                } else if (status == FiberStatus.RanToCompletion) {
                     if (options == FiberContinuationOptions.NotOnRanToCompletion)
                         return false;
                     if (options == FiberContinuationOptions.OnlyOnFaulted)
@@ -54,16 +54,16 @@ namespace SpicyPixel.Threading
         public void Execute()
         {
             // In case ran, faulted, canceled externally
-            if (Fiber.IsCompleted)
+            if (fiber.IsCompleted)
                 return;
 
             // Cancel the fiber if criteria is not met
-            if (!ContinuationStateCheck (Options)) {
-                Fiber.CancelContinuation();
+            if (!ContinuationStateCheck (options)) {
+                fiber.CancelContinuation();
                 return;
             }
 
-            Fiber.Start (Scheduler);
+            fiber.Start (scheduler);
         }
     }
 }

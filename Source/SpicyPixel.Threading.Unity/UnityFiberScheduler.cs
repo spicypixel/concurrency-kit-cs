@@ -96,9 +96,10 @@ namespace SpicyPixel.Threading
 			if(isDisposed)
 				throw new ObjectDisposedException(GetType().FullName);
 			
-            // FIXME: Coroutines are always inlined up to their
+            // Coroutines are always inlined up to their
             // first yield, so enqueuing here likely doesn't do
-            // anything other than delay a frame.
+            // anything other than delay a frame. But, it does
+            // ensure the correct thread.
             if(AllowInlining && SchedulerThread == Thread.CurrentThread)
                 StartUnityFiber(fiber);
             else
