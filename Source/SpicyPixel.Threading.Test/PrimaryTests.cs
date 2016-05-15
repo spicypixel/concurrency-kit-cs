@@ -510,6 +510,29 @@ namespace SpicyPixel.Threading.Test
             FiberScheduler.Current.Run(Fiber.Delay(2000));
             Assert.GreaterOrEqual(DateTime.Now, startTime + TimeSpan.FromSeconds(2));
         }
+
+        bool fiber1Ran;
+        bool fiber2Ran;
+
+        [Test]
+        public void TestFiberContinueWithAction()
+        {
+            fiber1Ran = false;
+            fiber2Ran = false;
+
+            Fiber.Factory.StartNew (() => {
+                fiber1Ran = true;
+            }).ContinueWith(f => fiber2Ran = true);
+
+            FiberScheduler.Current.Run(new Fiber(TestFiberContinueWithActionCoroutine()));
+        }
+
+        IEnumerator TestFiberContinueWithActionCoroutine()
+        {
+            yield return new YieldForSeconds(1f);
+            Assert.IsTrue(fiber1Ran);
+            Assert.IsTrue(fiber2Ran);
+        }
     }
 }
 
