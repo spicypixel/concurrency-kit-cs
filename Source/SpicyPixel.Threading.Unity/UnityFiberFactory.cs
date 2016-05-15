@@ -39,7 +39,7 @@ namespace SpicyPixel.Threading
 	public static class UnityFiberFactory
 	{
 		private static readonly FiberFactory instance = new FiberFactory(
-            CancellationToken.None,
+            UnityFiberScheduler.Default.CancellationToken,
 			FiberContinuationOptions.None, UnityFiberScheduler.Default);
 
 		/// <summary>
