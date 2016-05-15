@@ -125,7 +125,7 @@ namespace SpicyPixel.Threading
                 if ((millisecondsTimeout != Timeout.Infinite 
                     && (DateTime.Now - startWait).TotalMilliseconds >= millisecondsTimeout) ||
                     cancellationToken.IsCancellationRequested) {
-                    yield return new FiberResult(false);
+                    yield return new FiberResult(null);
                 }
 
                 var fiber = fibers.FirstOrDefault(f => f.IsCompleted);
