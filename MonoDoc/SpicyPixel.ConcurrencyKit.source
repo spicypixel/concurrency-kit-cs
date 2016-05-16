@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<monodoc>
+  <node label="Spicy Pixel Concurrency Kit" name="SpicyPixel.ConcurrencyKit-lib" parent="libraries" />
+  <source provider="ecma" basefile="SpicyPixel.ConcurrencyKit" path="SpicyPixel.ConcurrencyKit-lib"/>
+</monodoc>

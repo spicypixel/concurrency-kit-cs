@@ -10,3 +10,7 @@ Source/*/test-results
 node_modules
 *.qch
 TestResult.xml
+Doxygen/xml
+MonoDoc/assemble
+MonoDoc/html
+MonoDoc/xml
