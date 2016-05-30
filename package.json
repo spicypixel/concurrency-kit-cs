@@ -1,11 +1,14 @@
 {
-  "name": "spicypixel-concurrency-kit-cs",
+  "name": "@spicypixel-private/concurrency-kit-cs",
   "version": "1.1.0",
   "description": "Spicy Pixel Concurrency Kit C#",
   "private": true,
   "main": "gulpfile.js",
   "scripts": {
-    "postinstall": "gulp install"
+    "postinstall": "gulp build"
+  },
+  "publishConfig": {
+    "registry": "http://npm.private:4873"
   },
   "repository": {
     "type": "git",
@@ -24,6 +27,9 @@
   "author": "Spicy Pixel, Inc.",
   "license": "MIT",
   "dependencies": {
+    "@spicypixel-private/core-kit-js": ">=0.0.11",
+    "@spicypixel-private/unity-kit-js": ">=0.0.3",
+    "bluebird": "^3.4.0",
     "del": "^2.2.0",
     "flatten": "^1.0.2",
     "gulp": "^3.9.1",

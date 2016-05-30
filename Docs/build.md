@@ -55,18 +55,10 @@ The NPM post-install script will also start a build.
 
 ### Build tasks
 
-Run using gulp.
+Run tasks using gulp.
 
 ```
 gulp build
 ```
 
-Tasks
-
-* clean
-* build
-* rebuild
-* docs
-* test
-
-See `gulpfile.js` for details.
+See `gulpfile.ts` for details.
