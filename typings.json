@@ -1,5 +1,6 @@
 {
   "globalDependencies": {
+    "fs-extra": "registry:dt/fs-extra#0.0.0+20160319124112",
     "node": "registry:dt/node#6.0.0+20160524002506"
   },
   "dependencies": {

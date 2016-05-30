@@ -7,10 +7,9 @@ let shell = require("gulp-shell");
 let spawn = require("child_process").spawn;
 let exec = require('child_process').exec;
 let path = require("path");
-let pathExists = require("path-exists");
-let mkdirp = require('mkdirp');
 let flatten = require("gulp-flatten");
 
+import * as fs from "fs-extra";
 import * as Promise from "bluebird";
 import { ChildProcess } from "@spicypixel-private/core-kit-js/lib/child-process"
 import { UnityEditor } from "@spicypixel-private/unity-kit-js/lib/unity-editor"
@@ -41,6 +40,7 @@ gulp.task("install:monodocs", () => installMonoDocs());
 
 function clean() {
   gutil.log(gutil.colors.cyan("Cleaning ..."));
+  
   return del(["Source/**/bin/*", "Source/**/obj/*",
     "Doxygen/html", "Doxygen/xml", "Doxygen/qt",
     "MonoDoc/xml", "MonoDoc/assemble", "MonoDoc/html"]);
@@ -128,7 +128,7 @@ function assembleMonoDoc() {
   gutil.log(gutil.colors.cyan("Assembling MonoDocs ..."));
 
   let assembleDir = path.join(__dirname, "MonoDoc/assemble");
-  mkdirp.sync(assembleDir);
+  fs.mkdirpSync(assembleDir);
   let prefix = path.join(assembleDir, "SpicyPixel.ConcurrencyKit");
   return ChildProcess.spawnAsync("mdoc", [
     "assemble", "-o", prefix, "MonoDoc/xml"
