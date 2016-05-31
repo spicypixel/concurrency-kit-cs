@@ -16,6 +16,7 @@
     "Docs",
     "Doxygen",
     "MonoDoc",
-    "Source"
+    "Source",
+    "gulpfile.ts"
   ]
 }

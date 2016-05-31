@@ -2,17 +2,13 @@ let gulp = require("gulp");
 let gutil = require("gulp-util");
 let msbuild = require("gulp-msbuild");
 let nunit = require("gulp-nunit-runner");
-let del = require("del");
-let shell = require("gulp-shell");
-let spawn = require("child_process").spawn;
 let exec = require('child_process').exec;
 let path = require("path");
 let flatten = require("gulp-flatten");
 
-import * as fs from "fs-extra";
-import * as Promise from "bluebird";
-import { ChildProcess } from "@spicypixel-private/core-kit-js/lib/child-process"
-import { UnityEditor } from "@spicypixel-private/unity-kit-js/lib/unity-editor"
+import * as FileSystem from "@spicypixel-private/core-kit-js/lib/file-system";
+import ChildProcess from "@spicypixel-private/core-kit-js/lib/child-process";
+import { UnityEditor } from "@spicypixel-private/unity-kit-js/lib/unity-editor";
 
 // Default task to run continuous integration
 gulp.task("default", ["build"]);
@@ -40,8 +36,8 @@ gulp.task("install:monodocs", () => installMonoDocs());
 
 function clean() {
   gutil.log(gutil.colors.cyan("Cleaning ..."));
-  
-  return del(["Source/**/bin/*", "Source/**/obj/*",
+
+  return FileSystem.removePatternsAsync(["Source/**/bin/*", "Source/**/obj/*",
     "Doxygen/html", "Doxygen/xml", "Doxygen/qt",
     "MonoDoc/xml", "MonoDoc/assemble", "MonoDoc/html"]);
 }
@@ -124,11 +120,11 @@ function mergeDoxygenToMonoDoc() {
     path.join(__dirname, "MonoDoc/xml"), { log: true }]);
 }
 
-function assembleMonoDoc() {
+async function assembleMonoDoc() {
   gutil.log(gutil.colors.cyan("Assembling MonoDocs ..."));
 
   let assembleDir = path.join(__dirname, "MonoDoc/assemble");
-  fs.mkdirpSync(assembleDir);
+  await FileSystem.Directory.createRecursiveAsync(assembleDir);
   let prefix = path.join(assembleDir, "SpicyPixel.ConcurrencyKit");
   return ChildProcess.spawnAsync("mdoc", [
     "assemble", "-o", prefix, "MonoDoc/xml"

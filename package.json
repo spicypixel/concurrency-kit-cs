@@ -30,13 +30,11 @@
     "@spicypixel-private/core-kit-js": ">=0.0.11",
     "@spicypixel-private/unity-kit-js": ">=0.0.3",
     "bluebird": "^3.4.0",
-    "del": "^2.2.0",
     "flatten": "^1.0.2",
     "fs-extra": "^0.30.0",
     "gulp": "^3.9.1",
     "gulp-flatten": "^0.2.0",
     "gulp-msbuild": "^0.3.2",
-    "gulp-nunit-runner": "^0.5.2",
-    "gulp-shell": "^0.5.2"
+    "gulp-nunit-runner": "^0.5.2"
   }
 }
