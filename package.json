@@ -21,6 +21,7 @@
     "Source",
     "Doxyfile",
     "gulpfile.js",
+    "gulpfile.ts",
     "LICENSE.md",
     "README.md"
   ],
