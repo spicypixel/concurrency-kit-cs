@@ -1,56 +1,42 @@
-let gulp = require("gulp");
+import * as gulp from "gulp";
 let gutil = require("gulp-util");
 let msbuild = require("gulp-msbuild");
 let nunit = require("gulp-nunit-runner");
-let exec = require('child_process').exec;
-let path = require("path");
-let flatten = require("gulp-flatten");
 
 import * as FileSystem from "@spicypixel-private/core-kit-js/lib/file-system";
 import ChildProcess from "@spicypixel-private/core-kit-js/lib/child-process";
-import { UnityEditor } from "@spicypixel-private/unity-kit-js/lib/unity-editor";
+import UnityEditor from "@spicypixel-private/unity-kit-js/lib/unity-editor";
+import * as BuildKit from "@spicypixel-private/build-kit-js";
 
-// Default task to run continuous integration
-gulp.task("default", ["build"]);
+let monoDocBuilder = new BuildKit.MonoDocBuilder();
 
-// Rebuild is a clean followed by build
-gulp.task("rebuild", () => clean().then(() => build()));
-
-// Clean removes build artifacts
+gulp.task("default", () => build());
 gulp.task("clean", () => clean());
-
-// Build code
+gulp.task("rebuild", () => clean().then(() => build()));
 gulp.task("build:code", () => buildCode());
-
-// Build docs
 gulp.task("build:docs", () => buildDocs());
-
-// Build code and docs
-gulp.task("build", () => buildCode().then(() => buildDocs()));
-
-// Test with NUnit
+gulp.task("build", () => build());
 gulp.task("test", () => buildCode().then(() => test()));
-
-// Install
 gulp.task("install:monodocs", () => installMonoDocs());
 
-function clean() {
+async function clean() {
   gutil.log(gutil.colors.cyan("Cleaning ..."));
 
-  return FileSystem.removePatternsAsync(["Source/**/bin/*", "Source/**/obj/*",
+  await FileSystem.removePatternsAsync([
+    "Source/**/bin/*", "Source/**/obj/*",
     "Doxygen/html", "Doxygen/xml", "Doxygen/qt",
     "MonoDoc/xml", "MonoDoc/assemble", "MonoDoc/html"]);
 }
 
-function build() {
-  return buildCode().then(() => buildDocs());
+async function build() {
+  await buildCode();
+  await buildDocs();
 }
 
-// Build code
-function buildCode() {
+async function buildCode() {
   gutil.log(gutil.colors.cyan("Bulding code ..."));
 
-  return new Promise((resolve, reject) => {
+  await new Promise((resolve, reject) => {
     gulp
       .src("Source/**/*.sln")
       .pipe(msbuild({
@@ -66,94 +52,20 @@ function buildCode() {
   });
 }
 
-// Install node dependencies
-function installDoxygenTheme() {
-  gutil.log(gutil.colors.cyan("Installing doxygen theme ..."));
-
-  return ChildProcess.spawnAsync("npm", ["install"],
-    { cwd: path.join(__dirname, "Doxygen", "theme", "bootstrap"), log: true });
+async function installMonoDocs() {
+  await monoDocBuilder.installAsync();
 }
 
-// Build Doxygen
-function buildDoxygen() {
-  gutil.log(gutil.colors.cyan("Building Doxygen docs ..."));
-  return ChildProcess.spawnAsync("doxygen", [], { log: true });
-}
+async function buildDocs() {
+  await BuildKit.DoxygenBuilder.buildAsync();
 
-// Update MonoDoc external docs
-function updateMonoDoc() {
   let assemblies = [
     "System.Threading",
     "SpicyPixel.Threading",
     "SpicyPixel.Threading.Unity"];
-
-  let assemblyPaths: string[] = [];
-  assemblies.forEach(a => {
-    assemblyPaths = assemblyPaths.concat(
-      path.join(__dirname, "Source", a,
-        "bin", "Release", a + ".dll"));
-  });
-
-  let xmlParams: string[] = [];
-  assemblies.forEach(a => {
-    xmlParams = xmlParams.concat("-i");
-    xmlParams = xmlParams.concat(
-      path.join(__dirname, "Source", a,
-        "bin", "Release", a + ".xml"));
-  });
-
-  return ChildProcess.spawnAsync("mdoc", [
-    "update",
-    "-out:MonoDoc/xml",
-  ].concat(xmlParams).concat(assemblyPaths), { log: true });
+  await monoDocBuilder.buildAsync("SpicyPixel.ConcurrencyKit", assemblies);
 }
 
-// Merge Doxygen to MonoDoc
-function mergeDoxygenToMonoDoc() {
-  gutil.log(gutil.colors.cyan("Merging docs ..."));
-  let appDir = require.resolve("doxygentoecma")
-    .match(/.*\/node_modules\/[^/]+\//)[0];
-  let doxygentoecmaPath = path.join(appDir, "bin", "Release", "doxygentoecma.exe");
-
-  return ChildProcess.spawnAsync("mono", [doxygentoecmaPath,
-    path.join(__dirname, "Doxygen/xml"),
-    path.join(__dirname, "MonoDoc/xml"), { log: true }]);
-}
-
-async function assembleMonoDoc() {
-  gutil.log(gutil.colors.cyan("Assembling MonoDocs ..."));
-
-  let assembleDir = path.join(__dirname, "MonoDoc/assemble");
-  await FileSystem.Directory.createRecursiveAsync(assembleDir);
-  let prefix = path.join(assembleDir, "SpicyPixel.ConcurrencyKit");
-  return ChildProcess.spawnAsync("mdoc", [
-    "assemble", "-o", prefix, "MonoDoc/xml"
-  ], { log: true });
-}
-
-function installMonoDocs() {
-  return new Promise((resolve, reject) => {
-    getMonoDocInstallPath((path: string) => {
-      gulp
-        .src(["MonoDoc/assemble/*", "MonoDoc/*.source"])
-        .pipe(flatten())
-        .pipe(gulp.dest(path))
-        .on("end", resolve)
-        .on("error", reject);
-    });
-  });
-}
-
-// Build docs
-function buildDocs() {
-  return installDoxygenTheme()
-    .then(() => buildDoxygen())
-    .then(() => updateMonoDoc())
-    // .then(() => mergeDoxygenToMonoDoc())
-    .then(() => assembleMonoDoc());
-}
-
-// Test with NUnit
 function test() {
   return gulp
     .src(["**/bin/**/*Test.dll"], { read: false })
@@ -161,15 +73,4 @@ function test() {
       executable: "/usr/local/bin",
       teamcity: false
     }));
-}
-
-function execute(command: string, callback: Function): void {
-  exec(command, function (error: Error, stdout: any, stderr: any) {
-    callback(stdout);
-  });
-};
-
-function getMonoDocInstallPath(callback: Function) {
-  callback("/Library/Frameworks/Mono.framework/External/monodoc/");
-  // execute("pkg-config monodoc --variable=sourcesdir", callback);
 }
