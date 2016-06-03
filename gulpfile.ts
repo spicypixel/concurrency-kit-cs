@@ -66,11 +66,14 @@ async function buildDocs() {
   await monoDocBuilder.buildAsync("SpicyPixel.ConcurrencyKit", assemblies);
 }
 
-function test() {
-  return gulp
-    .src(["**/bin/**/*Test.dll"], { read: false })
-    .pipe(nunit({
-      executable: "/usr/local/bin",
-      teamcity: false
-    }));
+async function test() {
+  await new Promise((resolve, reject) => {
+    return gulp
+      .src(["**/bin/**/*Test.dll"], { read: false })
+      .pipe(nunit({
+        executable: "/usr/local/bin",
+        teamcity: false
+      })).once("end", resolve)
+      .once("error", reject);
+  });
 }
