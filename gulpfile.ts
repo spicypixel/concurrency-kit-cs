@@ -1,8 +1,8 @@
 import * as gulp from "gulp";
 
-import * as FileSystem from "@spicypixel-private/core-kit-js/lib/file-system";
-import UnityEditor from "@spicypixel-private/unity-kit-js/lib/unity-editor";
-import * as BuildKit from "@spicypixel-private/build-kit-js";
+import * as FileSystem from "@spicypixel/core-kit-js/lib/file-system";
+import UnityEditor from "@spicypixel/unity-kit-js/lib/unity-editor";
+import * as BuildKit from "@spicypixel/build-kit-js";
 
 gulp.task("default", () => build());
 gulp.task("clean", () => clean());
