@@ -1,7 +1,7 @@
 cache:
   paths:
     - node_modules/
-  
+
 build:
   script:
     - npm prune
