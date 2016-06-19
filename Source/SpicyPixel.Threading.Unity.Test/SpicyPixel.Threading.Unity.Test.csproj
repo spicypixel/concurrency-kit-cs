@@ -29,6 +29,9 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>False</ConsolePause>
   </PropertyGroup>
+  <PropertyGroup>
+    <UnityEnginePath Condition="$(UnityEnginePath) == ''">/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEngine.dll</UnityEnginePath>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral">

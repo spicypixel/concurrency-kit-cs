@@ -10,7 +10,6 @@
     <RootNamespace>SpicyPixel.Threading</RootNamespace>
     <AssemblyName>SpicyPixel.Threading.Unity</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <UseMSBuildEngine>False</UseMSBuildEngine>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>
@@ -31,6 +30,9 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>False</ConsolePause>
     <DocumentationFile>bin\Release\SpicyPixel.Threading.Unity.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <UnityEnginePath Condition="$(UnityEnginePath) == ''">/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEngine.dll</UnityEnginePath>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
