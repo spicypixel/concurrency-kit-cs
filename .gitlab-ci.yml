@@ -5,6 +5,6 @@ cache:
 build:
   script:
     - npm prune
-    - npm update
+    - npm update --depth Infinity
     - npm install
     - node node_modules/.bin/gulp test

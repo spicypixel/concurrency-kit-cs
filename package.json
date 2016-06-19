@@ -14,9 +14,9 @@
   "author": "Spicy Pixel, Inc.",
   "license": "MIT",
   "dependencies": {
-    "@spicypixel/build-kit-js": ">=0.0.33",
-    "@spicypixel/core-kit-js": ">=0.0.33",
-    "@spicypixel/unity-kit-js": ">=0.0.16",
+    "@spicypixel/build-kit-js": "*",
+    "@spicypixel/core-kit-js": "*",
+    "@spicypixel/unity-kit-js": "*",
     "gulp": "^3.9.1"
   }
 }
