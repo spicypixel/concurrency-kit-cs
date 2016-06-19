@@ -3,6 +3,7 @@ using System.Collections;
 using System.Threading;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SpicyPixel.Threading
 {
@@ -105,7 +106,7 @@ namespace SpicyPixel.Threading
                     throw new ArgumentException ("fibers", "the fibers argument contains a null element");              
             }
 
-            return Fiber.Factory.StartNew(WhenAllCoroutine(fibers, millisecondsTimeout, cancellationToken), scheduler);
+            return Fiber.Factory.StartNew(WhenAllFibersCoroutine(fibers, millisecondsTimeout, cancellationToken), scheduler);
         }
 
         /// <summary>
@@ -125,7 +126,7 @@ namespace SpicyPixel.Threading
             return WhenAll(fibers.ToArray(), millisecondsTimeout, cancellationToken, scheduler);
         }
 
-        static IEnumerator WhenAllCoroutine(IEnumerable<Fiber> fibers, int millisecondsTimeout, CancellationToken cancellationToken)
+        static IEnumerator WhenAllFibersCoroutine(IEnumerable<Fiber> fibers, int millisecondsTimeout, CancellationToken cancellationToken)
         {
             var startWait = DateTime.Now;
             while (true) {
@@ -137,6 +138,141 @@ namespace SpicyPixel.Threading
 
                 if (fibers.All(f => f.IsCompleted)) {
                     yield return new FiberResult(true);
+                }
+
+                yield return FiberInstruction.YieldToAnyFiber;
+            }
+        }
+
+        /// <summary>
+        /// Returns a fiber that waits on all tasks to complete.
+        /// </summary>
+        /// <remarks>
+        /// `Fiber.ResultAsObject` will be `true` if all tasks complete
+        /// successfully or `false` if cancelled or timeout.
+        /// </remarks>
+        /// <returns>A fiber that waits on all tasks to complete.</returns>
+        /// <param name="tasks">Tasks to wait for completion.</param>
+        public static Fiber WhenAll (params Task [] tasks)
+        {
+            return WhenAll (tasks, Timeout.Infinite, CancellationToken.None);
+        }
+
+        /// <summary>
+        /// Returns a fiber that waits on all tasks to complete.
+        /// </summary>
+        /// <remarks>
+        /// `Fiber.ResultAsObject` will be `true` if all tasks complete
+        /// successfully or `false` if cancelled or timeout.
+        /// </remarks>
+        /// <returns>A fiber that waits on all tasks to complete.</returns>
+        /// <param name="tasks">Tasks to wait for completion.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        public static Fiber WhenAll (Task [] tasks, CancellationToken cancellationToken)
+        {
+            return WhenAll (tasks, Timeout.Infinite, cancellationToken);
+        }
+
+        /// <summary>
+        /// Returns a fiber that waits on all tasks to complete.
+        /// </summary>
+        /// <remarks>
+        /// `Fiber.ResultAsObject` will be `true` if all tasks complete
+        /// successfully or `false` if cancelled or timeout.
+        /// </remarks>
+        /// <returns>A fiber that waits on all tasks to complete.</returns>
+        /// <param name="tasks">Tasks to wait for completion.</param>
+        /// <param name="timeout">Timeout.</param>
+        public static Fiber WhenAll (Task [] tasks, TimeSpan timeout)
+        {
+            return WhenAll (tasks, CheckTimeout (timeout), CancellationToken.None);
+        }
+
+        /// <summary>
+        /// Returns a fiber that waits on all tasks to complete.
+        /// </summary>
+        /// <remarks>
+        /// `Fiber.ResultAsObject` will be `true` if all tasks complete
+        /// successfully or `false` if cancelled or timeout.
+        /// </remarks>
+        /// <returns>A fiber that waits on all tasks to complete.</returns>
+        /// <param name="tasks">Tasks to wait for completion.</param>
+        /// <param name="millisecondsTimeout">Milliseconds timeout.</param>
+        public static Fiber WhenAll (Task [] tasks, int millisecondsTimeout)
+        {
+            return WhenAll (tasks, millisecondsTimeout, CancellationToken.None);
+        }
+
+        /// <summary>
+        /// Returns a fiber that waits on all tasks to complete.
+        /// </summary>
+        /// <remarks>
+        /// `Fiber.ResultAsObject` will be `true` if all tasks complete
+        /// successfully or `false` if cancelled or timeout.
+        /// </remarks>
+        /// <returns>A fiber that waits on all tasks to complete.</returns>
+        /// <param name="tasks">Tasks to wait for completion.</param>
+        /// <param name="millisecondsTimeout">Milliseconds timeout.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        public static Fiber WhenAll (Task [] tasks, int millisecondsTimeout, CancellationToken cancellationToken)
+        {
+            return WhenAll (tasks, millisecondsTimeout, cancellationToken, FiberScheduler.Current);
+        }
+
+        /// <summary>
+        /// Returns a fiber that waits on all tasks to complete.
+        /// </summary>
+        /// <remarks>
+        /// `Fiber.ResultAsObject` will be `true` if all tasks complete
+        /// successfully or `false` if cancelled or timeout.
+        /// </remarks>
+        /// <returns>A fiber that waits on all tasks to complete.</returns>
+        /// <param name="tasks">Tasks to wait for completion.</param>
+        /// <param name="millisecondsTimeout">Milliseconds timeout.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <param name="scheduler">Scheduler.</param>
+        public static Fiber WhenAll (Task [] tasks, int millisecondsTimeout, CancellationToken cancellationToken, FiberScheduler scheduler)
+        {
+            if (tasks == null)
+                throw new ArgumentNullException ("tasks");
+
+            foreach (var fiber in tasks) {
+                if (fiber == null)
+                    throw new ArgumentException ("tasks", "the tasks argument contains a null element");
+            }
+
+            return Fiber.Factory.StartNew (WhenAllTasksCoroutine (tasks, millisecondsTimeout, cancellationToken), scheduler);
+        }
+
+        /// <summary>
+        /// Returns a fiber that waits on all tasks to complete.
+        /// </summary>
+        /// <remarks>
+        /// `Fiber.ResultAsObject` will be `true` if all tasks complete
+        /// successfully or `false` if cancelled or timeout.
+        /// </remarks>
+        /// <returns>A fiber that waits on all tasks to complete.</returns>
+        /// <param name="tasks">Tasks to wait for completion.</param>
+        /// <param name="millisecondsTimeout">Milliseconds timeout.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <param name="scheduler">Scheduler.</param>
+        public static Fiber WhenAll (IEnumerable<Task> tasks, int millisecondsTimeout, CancellationToken cancellationToken, FiberScheduler scheduler)
+        {
+            return WhenAll (tasks.ToArray (), millisecondsTimeout, cancellationToken, scheduler);
+        }
+
+        static IEnumerator WhenAllTasksCoroutine (IEnumerable<Task> tasks, int millisecondsTimeout, CancellationToken cancellationToken)
+        {
+            var startWait = DateTime.Now;
+            while (true) {
+                if ((millisecondsTimeout != Timeout.Infinite
+                    && (DateTime.Now - startWait).TotalMilliseconds >= millisecondsTimeout) ||
+                    cancellationToken.IsCancellationRequested) {
+                    yield return new FiberResult (false);
+                }
+
+                if (tasks.All (t => t.IsCompleted)) {
+                    yield return new FiberResult (true);
                 }
 
                 yield return FiberInstruction.YieldToAnyFiber;
