@@ -63,6 +63,7 @@
     <Compile Include="Fiber.ContinueWith.cs" />
     <Compile Include="FiberFactory.cs" />
     <Compile Include="FiberFactory.StartNew.cs" />
+    <Compile Include="ParallelOpportunistic.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\System.Threading\System.Threading.csproj">

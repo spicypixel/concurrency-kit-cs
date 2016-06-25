@@ -324,7 +324,8 @@ namespace System.Threading.Tasks
 #endregion
 
 #region Foreach
-		static ParallelLoopResult ForEach<TSource, TLocal> (Func<int, IList<IEnumerator<TSource>>> enumerable, ParallelOptions options,
+        // Spicy Pixel: Made internal
+		internal static ParallelLoopResult ForEach<TSource, TLocal> (Func<int, IList<IEnumerator<TSource>>> enumerable, ParallelOptions options,
 		                                                    Func<TLocal> init, Func<TSource, ParallelLoopState, TLocal, TLocal> action,
 		                                                    Action<TLocal> destruct)
 		{

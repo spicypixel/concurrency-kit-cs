@@ -96,7 +96,7 @@ namespace SpicyPixel.Threading.Tasks
 		/// <param name="task">
 		/// The non-blocking task to queue.
 		/// </param>
-		protected override void QueueTask (Task task)
+		protected internal override void QueueTask (Task task)
 		{	
             // Start a fiber to run the task
             Fiber.Factory.StartNew(ExecuteTask(task), scheduler);
@@ -158,7 +158,7 @@ namespace SpicyPixel.Threading.Tasks
         /// <param name="task">
         /// The task to dequeue.
         /// </param>
-        protected override bool TryDequeue (Task task)
+        protected internal override bool TryDequeue (Task task)
         {
             return false;
         }

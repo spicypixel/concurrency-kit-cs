@@ -533,6 +533,60 @@ namespace SpicyPixel.Threading.Test
             Assert.IsTrue(fiber1Ran);
             Assert.IsTrue(fiber2Ran);
         }
+
+        [Test]
+        public void TestParallelFor ()
+        {
+            ParallelOpportunistic.SupportsParallelism = true;
+            int x = 0;
+            ParallelOpportunistic.For (0, 10, a => ++x);
+            Assert.AreEqual (x, 10);
+
+            ParallelOpportunistic.SupportsParallelism = false;
+            x = 0;
+            ParallelOpportunistic.For (0, 10, a => ++x);
+            Assert.AreEqual (x, 10);
+        }
+
+        [Test]
+        public void TestParallelForEach ()
+        {
+            int [] x = new int [10];
+            for (int i = 0; i < 10; ++i)
+                x [i] = 1;
+
+            int total = 0;
+            ParallelOpportunistic.SupportsParallelism = true;
+            ParallelOpportunistic.ForEach (x, i => total += i);
+            Assert.AreEqual (total, 10);
+
+            total = 0;
+            ParallelOpportunistic.SupportsParallelism = false;
+            ParallelOpportunistic.ForEach (x, i => total += i);
+            Assert.AreEqual (total, 10);
+        }
+
+        [Test]
+        public void TestParallelInvoke ()
+        {
+            int x = 0;
+
+            Action a1 = () => {
+                x += 2;
+            };
+            Action a2 = () => {
+                x += 3;
+            };
+
+            ParallelOpportunistic.SupportsParallelism = true;
+            ParallelOpportunistic.Invoke (a1, a2);
+            Assert.AreEqual (x, 5);
+
+            x = 0;
+            ParallelOpportunistic.SupportsParallelism = false;
+            ParallelOpportunistic.Invoke (a1, a2);
+            Assert.AreEqual (x, 5);
+        }
     }
 }
 
