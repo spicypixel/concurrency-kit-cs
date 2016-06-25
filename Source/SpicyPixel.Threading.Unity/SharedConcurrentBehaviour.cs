@@ -47,7 +47,7 @@ namespace SpicyPixel.Threading
 
 		static ConcurrentBehaviour CreateSharedInstance() {
 			GameObject go = new GameObject("Shared Concurrency Kit Scheduler");
-      if (!Application.isEditor)
+            if (!Application.isEditor)
 			    DontDestroyOnLoad(go);
 			go.hideFlags = HideFlags.HideAndDontSave;
 			var sharedInstance = go.AddComponent<SharedConcurrentBehaviour>();
