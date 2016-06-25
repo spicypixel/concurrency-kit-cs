@@ -80,7 +80,7 @@ namespace SpicyPixel.Threading.Test
 
             Assert.AreEqual(fiber.Status, FiberStatus.Faulted, "Expected Faulted");
             Assert.IsNotNull(fiber.Exception, "Expected an exception");
-            Assert.IsInstanceOfType(typeof(System.OperationCanceledException), fiber.Exception, 
+            Assert.IsInstanceOf(typeof(System.OperationCanceledException), fiber.Exception, 
                 "Expected OperationCanceledException");
         }
     }

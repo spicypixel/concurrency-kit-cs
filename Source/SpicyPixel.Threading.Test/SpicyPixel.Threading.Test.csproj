@@ -32,7 +32,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="nunit.framework">
-      <Package>/Applications/Unity/Unity.app/Contents/Frameworks/Managed/nunit.framework.dll</Package>
+      <HintPath>..\packages\NUnit.3.4.0\lib\net35\nunit.framework.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -49,5 +49,8 @@
       <Project>{4BCD180B-75CB-4C94-813D-B1459183BBA5}</Project>
       <Name>System.Threading</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
