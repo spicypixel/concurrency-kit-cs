@@ -72,23 +72,22 @@ namespace SpicyPixel.Threading
         [ThreadStatic]
         private static Fiber currentFiber;
 
-        private static FiberFactory fiberFactory = new FiberFactory();
-				
+        private static FiberFactory fiberFactory = new FiberFactory ();
+
         /// <summary>
         /// The next unique identifier.
         /// </summary>
         private static int nextId = 0;
-		
+
         private IEnumerator coroutine;
-        private Stack<IEnumerator> nestedCoroutines;
-		
+
         private Action action;
         private Action<object> actionObject;
         private object objectState;
-		
+
         private Func<FiberInstruction> func;
         private Func<object, FiberInstruction> funcObject;
-		
+
         private FiberScheduler scheduler;
         private int status = (int)FiberStatus.Created;
         // must be int to work with Interlocked on Mono
@@ -104,7 +103,7 @@ namespace SpicyPixel.Threading
         /// <value>
         /// The currently executing fiber on this thread.
         /// </value>
-        public static Fiber CurrentFiber { 
+        public static Fiber CurrentFiber {
             get {
                 return currentFiber;
             }
@@ -123,12 +122,12 @@ namespace SpicyPixel.Threading
             }
         }
 
-        static int CheckTimeout(TimeSpan timeout)
+        static int CheckTimeout (TimeSpan timeout)
         {
             try {
-                return checked ((int)timeout.TotalMilliseconds);
+                return checked((int)timeout.TotalMilliseconds);
             } catch (System.OverflowException) {
-                throw new ArgumentOutOfRangeException("timeout");
+                throw new ArgumentOutOfRangeException ("timeout");
             }
         }
 
@@ -148,11 +147,11 @@ namespace SpicyPixel.Threading
         /// The properties.
         /// </value>
         public IDictionary<string, object> Properties {
-            get { 
+            get {
                 if (properties == null)
-                    properties = new Dictionary<string, object>();
+                    properties = new Dictionary<string, object> ();
 
-                return properties; 
+                return properties;
             }
         }
 
@@ -162,8 +161,8 @@ namespace SpicyPixel.Threading
         /// <value>
         /// The scheduler that was used to start the fiber.
         /// </value>
-        internal FiberScheduler Scheduler { 
-            get { return scheduler; } 
+        internal FiberScheduler Scheduler {
+            get { return scheduler; }
             set { scheduler = value; }
         }
 
@@ -235,7 +234,7 @@ namespace SpicyPixel.Threading
         /// <value>
         /// The state of the fiber (Unstarted, Running, Stopped).
         /// </value>
-        public FiberStatus Status { 
+        public FiberStatus Status {
             get { return (FiberStatus)status; }
             set { status = (int)value; }
         }
@@ -271,7 +270,7 @@ namespace SpicyPixel.Threading
         /// <summary>
         /// Run to finish transitioning to Completed by execution continuations.
         /// </summary>
-        private void FinishCompletion()
+        private void FinishCompletion ()
         {
             if (continuations == null)
                 return;
@@ -279,9 +278,9 @@ namespace SpicyPixel.Threading
             while (true) {
                 if (continuations.Count == 0)
                     return;
-                
-                var continuation = continuations.Dequeue();
-                continuation.Execute();
+
+                var continuation = continuations.Dequeue ();
+                continuation.Execute ();
             }
         }
 
@@ -289,10 +288,22 @@ namespace SpicyPixel.Threading
         /// Called by a continuation to cancel the task and trigger other continuations.
         /// </summary>
         /// <returns><c>true</c> if this instance cancel continuation; otherwise, <c>false</c>.</returns>
-        internal void CancelContinuation()
+        internal void CancelContinuation ()
         {
             status = (int)FiberStatus.Canceled;
-            FinishCompletion();
+            FinishCompletion ();
+        }
+
+        /// <summary>
+        /// Faults the continuation.
+        /// </summary>
+        /// <returns>The continuation.</returns>
+        /// <param name="exception">Ex.</param>
+        internal void FaultContinuation (Exception exception)
+        {
+            status = (int)FiberStatus.Faulted;
+            Exception = exception;
+            FinishCompletion ();
         }
 
         /// <summary>
@@ -309,8 +320,8 @@ namespace SpicyPixel.Threading
         /// <param name='coroutine'>
         /// A couroutine to execute on the fiber.
         /// </param>
-        public Fiber(IEnumerator coroutine) : this(coroutine, CancellationToken.None)
-        {			
+        public Fiber (IEnumerator coroutine) : this (coroutine, CancellationToken.None)
+        {
         }
 
         /// <summary>
@@ -320,8 +331,8 @@ namespace SpicyPixel.Threading
         /// A couroutine to execute on the fiber.
         /// </param>
         /// <param name="cancellationToken">Cancellation token.</param>
-        public Fiber(IEnumerator coroutine, CancellationToken cancellationToken)
-        {           
+        public Fiber (IEnumerator coroutine, CancellationToken cancellationToken)
+        {
             Id = nextId++;
             this.coroutine = coroutine;
             this.cancelToken = cancellationToken;
@@ -333,7 +344,7 @@ namespace SpicyPixel.Threading
         /// <param name='action'>
         /// A non-blocking action to execute on the fiber.
         /// </param>
-        public Fiber(Action action) : this(action, CancellationToken.None)
+        public Fiber (Action action) : this (action, CancellationToken.None)
         {
         }
 
@@ -344,7 +355,7 @@ namespace SpicyPixel.Threading
         /// A non-blocking action to execute on the fiber.
         /// </param>
         /// <param name="cancellationToken">Cancellation token.</param>
-        public Fiber(Action action, CancellationToken cancellationToken)
+        public Fiber (Action action, CancellationToken cancellationToken)
         {
             Id = nextId++;
             this.action = action;
@@ -360,7 +371,7 @@ namespace SpicyPixel.Threading
         /// <param name='state'>
         /// State to pass to the action.
         /// </param>
-        public Fiber(Action<object> action, object state) : this(action, state, CancellationToken.None)
+        public Fiber (Action<object> action, object state) : this (action, state, CancellationToken.None)
         {
         }
 
@@ -374,7 +385,7 @@ namespace SpicyPixel.Threading
         /// State to pass to the action.
         /// </param>
         /// <param name="cancellationToken">Cancellation token.</param>
-        public Fiber(Action<object> action, object state, CancellationToken cancellationToken)
+        public Fiber (Action<object> action, object state, CancellationToken cancellationToken)
         {
             Id = nextId++;
             this.actionObject = action;
@@ -388,7 +399,7 @@ namespace SpicyPixel.Threading
         /// <param name='func'>
         /// A non-blocking function that returns a <see cref="FiberInstruction"/> when complete.
         /// </param>
-        public Fiber(Func<FiberInstruction> func) : this(func, CancellationToken.None)
+        public Fiber (Func<FiberInstruction> func) : this (func, CancellationToken.None)
         {
         }
 
@@ -399,7 +410,7 @@ namespace SpicyPixel.Threading
         /// A non-blocking function that returns a <see cref="FiberInstruction"/> when complete.
         /// </param>
         /// <param name="cancellationToken">Cancellation token.</param>
-        public Fiber(Func<FiberInstruction> func, CancellationToken cancellationToken)
+        public Fiber (Func<FiberInstruction> func, CancellationToken cancellationToken)
         {
             Id = nextId++;
             this.func = func;
@@ -415,7 +426,7 @@ namespace SpicyPixel.Threading
         /// <param name='state'>
         /// State to pass to the function.
         /// </param>
-        public Fiber(Func<object, FiberInstruction> func, object state) : this(func, state, CancellationToken.None)
+        public Fiber (Func<object, FiberInstruction> func, object state) : this (func, state, CancellationToken.None)
         {
         }
 
@@ -429,7 +440,7 @@ namespace SpicyPixel.Threading
         /// State to pass to the function.
         /// </param>
         /// <param name="cancellationToken">Cancellation token.</param>
-        public Fiber(Func<object, FiberInstruction> func, object state, CancellationToken cancellationToken)
+        public Fiber (Func<object, FiberInstruction> func, object state, CancellationToken cancellationToken)
         {
             Id = nextId++;
             this.funcObject = func;
@@ -440,9 +451,9 @@ namespace SpicyPixel.Threading
         /// <summary>
         /// Start executing the fiber using the default scheduler on the thread.
         /// </summary>
-        public void Start()
+        public void Start ()
         {
-            Start(FiberScheduler.Current);
+            Start (FiberScheduler.Current);
         }
 
         /// <summary>
@@ -455,22 +466,49 @@ namespace SpicyPixel.Threading
         /// <param name='scheduler'>
         /// The scheduler to start the fiber on.
         /// </param>
-        public void Start(FiberScheduler scheduler)
-        {	
+        public void Start (FiberScheduler scheduler)
+        {
             // It would be unusual to attempt to start a Fiber more than once,
             // but to be safe and to support calling from any thread
             // use Interlocked with boxing on the enum.
-			
-            var originalState = (FiberStatus)Interlocked.CompareExchange(ref status, (int)FiberStatus.WaitingToRun, (int)FiberStatus.Created);
+
+            var originalState = (FiberStatus)Interlocked.CompareExchange (ref status, (int)FiberStatus.WaitingToRun, (int)FiberStatus.Created);
             if (originalState != FiberStatus.Created) {
-                originalState = (FiberStatus)Interlocked.CompareExchange(ref status, (int)FiberStatus.WaitingToRun, (int)FiberStatus.WaitingForActivation);
+                originalState = (FiberStatus)Interlocked.CompareExchange (ref status, (int)FiberStatus.WaitingToRun, (int)FiberStatus.WaitingForActivation);
                 if (originalState != FiberStatus.WaitingForActivation) {
-                    throw new InvalidOperationException("A fiber cannot be started again once it has begun running or has completed.");
+                    throw new InvalidOperationException ("A fiber cannot be started again once it has begun running or has completed.");
                 }
             }
-			
+
             this.scheduler = scheduler;
-            ((IFiberScheduler)this.scheduler).QueueFiber(this);
+            ((IFiberScheduler)this.scheduler).QueueFiber (this);
+        }
+
+        /// <summary>
+        /// Throws if canceled.
+        /// </summary>
+        public void ThrowIfCanceled ()
+        {
+            if (IsCanceled)
+                throw new System.Threading.OperationCanceledException ();
+        }
+
+        /// <summary>
+        /// Throws if faulted.
+        /// </summary>
+        public void ThrowIfFaulted ()
+        {
+            if (IsFaulted)
+                throw Exception;
+        }
+
+        /// <summary>
+        /// Throws if canceled or faulted.
+        /// </summary>
+        public void ThrowIfCanceledOrFaulted ()
+        {
+            ThrowIfCanceled ();
+            ThrowIfFaulted ();
         }
 
         /// <summary>
@@ -479,13 +517,15 @@ namespace SpicyPixel.Threading
         /// <returns>
         /// A fiber instruction to be processed by the scheduler.
         /// </returns>
-        internal FiberInstruction Execute()
+        internal FiberInstruction Execute ()
         {
+            //Console.WriteLine ("Fiber {0}:{1} start executing", Id, Status);
+
             // Sanity check the scheduler. Since this is a scheduler
             // only issue, this test happens first before execution
             // and before allowing an exception handler to take over.
             if (IsCompleted)
-                throw new InvalidOperationException("An attempt was made to execute a completed Fiber. This indicates a logic error in the scheduler.");
+                throw new InvalidOperationException ("An attempt was made to execute a completed Fiber. This indicates a logic error in the scheduler.");
 
             // Setup thread globals with this scheduler as the owner.
             // The sync context is also setup when the scheduler changes.
@@ -510,7 +550,7 @@ namespace SpicyPixel.Threading
             // execution. Only something outside of the scheduler would
             // change the scheduler.
             if (FiberScheduler.Current != scheduler)
-                FiberScheduler.SetCurrentScheduler(scheduler, true);
+                FiberScheduler.SetCurrentScheduler (scheduler, true);
 
             // Push the current fiber onto the stack and pop it in finally.
             // This must be stacked because the fiber may spawn another
@@ -519,162 +559,140 @@ namespace SpicyPixel.Threading
             var lastFiber = Fiber.CurrentFiber;
             Fiber.CurrentFiber = this;
 
+            // Start the fiber if not started
+            Interlocked.CompareExchange (ref status, (int)FiberStatus.WaitingToRun, (int)FiberStatus.Created);
+            Interlocked.CompareExchange (ref status, (int)FiberStatus.Running, (int)FiberStatus.WaitingToRun);
+
             try {
-                // The loop will execute until hitting a valid instruction.
-                // Specifically, nested coroutines need to execute this until
-                // a yield instruction is hit.
-                while (true) {
-                    object result = null;
+                object result = null;
 
-                    // Execute the coroutine or action
-                    if (nestedCoroutines != null && nestedCoroutines.Count > 0) {
-                        var nestedCoroutine = nestedCoroutines.Peek();
-                        if (nestedCoroutine.MoveNext()) {
-                            result = nestedCoroutine.Current;
+                // Execute the coroutine or action
+                if (coroutine != null) {
+                    //Console.WriteLine ("Fiber {0}:{1} start executing coroutine", Id, Status);
+                    // Execute coroutine
+                    if (coroutine.MoveNext ()) {
+                        // Get result of execution
+                        result = coroutine.Current;
 
-                            // A stop instruction in a nested coroutine
-                            // means stop that execution, not the parent
-                            if (result is StopInstruction) {
-                                nestedCoroutines.Pop();
-                                continue;
-                            }
-                        } else {
-                            // Nested routine finished
-                            nestedCoroutines.Pop();
-                            continue;
-                        }
-                    } else if (coroutine != null) {
-                        // Execute coroutine
-                        if (coroutine.MoveNext()) {
-                            // Get result of execution
-                            result = coroutine.Current;
-
-                            // If the coroutine returned a stop directly
-                            // the fiber still needs to process it
-                            if (result is StopInstruction)
-                                Stop(FiberStatus.RanToCompletion);
-                        } else {
-                            // Coroutine finished executing
-                            result = Stop(FiberStatus.RanToCompletion);
-                        }
-                    } else if (action != null) {
-                        // Execute action
-                        action();
-						
-                        // Action finished executing
-                        result = Stop(FiberStatus.RanToCompletion);
-                    } else if (actionObject != null) {
-                        // Execute action
-                        actionObject(objectState);
-	                    
-                        // Action finished executing
-                        result = Stop(FiberStatus.RanToCompletion);
-                    } else if (func != null) {
-                        result = func();
-                        func = null;
-
+                        // If the coroutine returned a stop directly
+                        // the fiber still needs to process it
                         if (result is StopInstruction)
-                            Stop(FiberStatus.RanToCompletion);
-                    } else if (funcObject != null) {
-                        result = funcObject(objectState);
-                        funcObject = null;
-
-                        if (result is StopInstruction)
-                            Stop(FiberStatus.RanToCompletion);
+                            Stop (FiberStatus.RanToCompletion);
                     } else {
-                        // Func execution nulls out the function
-                        // so the scheduler will return to here
-                        // when complete and then stop.
-                        result = Stop(FiberStatus.RanToCompletion);
+                        // Coroutine finished executing
+                        result = Stop (FiberStatus.RanToCompletion);
                     }
-					
-                    // Treat null as a special case
-                    if (result == null)
-                        return FiberInstruction.YieldToAnyFiber;
+                    //Console.WriteLine ("Fiber {0}:{1} end executing coroutine", Id, Status);
+                } else if (action != null) {
+                    // Execute action
+                    action ();
 
-                    // Return instructions or throw if invalid
-                    var instruction = result as FiberInstruction;
-                    if (instruction == null) {
-                        // If the result was an enumerator there is a nested coroutine to execute
-                        if (result is IEnumerator) {
-                            // Lazy create
-                            if (nestedCoroutines == null)
-                                nestedCoroutines = new Stack<IEnumerator>();
-							
-                            // Push the nested coroutine onto the stack
-                            nestedCoroutines.Push(result as IEnumerator);
+                    // Action finished executing
+                    result = Stop (FiberStatus.RanToCompletion);
+                } else if (actionObject != null) {
+                    // Execute action
+                    actionObject (objectState);
 
-                            // For performance we execute nested coroutines until hitting
-                            // an actual instruction at the deepest nest level.
-                            result = null;
-                            continue;
-                        } else if (result is Fiber) {
-                            // Convert fibers into yield instructions
-                            instruction = new YieldUntilComplete(result as Fiber);
-                        } else {
-                            // Pass through other values
-                            return new ObjectInstruction(result);
-                        }
-                    }
+                    // Action finished executing
+                    result = Stop (FiberStatus.RanToCompletion);
+                } else if (func != null) {
+                    result = func ();
+                    func = null;
 
-                    if (instruction is FiberResult) {
-                        ResultAsObject = ((FiberResult)instruction).Result;
-                        result = Stop(FiberStatus.RanToCompletion);
-                    }
+                    if (result is StopInstruction)
+                        Stop (FiberStatus.RanToCompletion);
+                } else if (funcObject != null) {
+                    result = funcObject (objectState);
+                    funcObject = null;
 
-                    // Verify same scheduler	
-                    if (instruction is YieldUntilComplete && ((YieldUntilComplete)instruction).Fiber.Scheduler != FiberScheduler.Current)
-                        throw new InvalidOperationException("Currently only fibers belonging to the same scheduler may be yielded to. FiberScheduler.Current = "
-                        + (FiberScheduler.Current == null ? "null" : FiberScheduler.Current.ToString())
-                        + ", Fiber.Scheduler = " + (((YieldUntilComplete)instruction).Fiber.Scheduler == null ? "null" : ((YieldUntilComplete)instruction).Fiber.Scheduler.ToString()));
-					
-                    var yieldToFiberInstruction = instruction as YieldToFiber;									
-                    if (yieldToFiberInstruction != null) {
-                        // Start fibers yielded to that aren't running yet
-                        Interlocked.CompareExchange(ref yieldToFiberInstruction.Fiber.status, (int)FiberStatus.WaitingToRun, (int)FiberStatus.Created);
-                        var originalState = (FiberStatus)Interlocked.CompareExchange(ref yieldToFiberInstruction.Fiber.status, (int)FiberStatus.Running, (int)FiberStatus.WaitingToRun);
-                        if (originalState == FiberStatus.WaitingToRun)
-                            yieldToFiberInstruction.Fiber.scheduler = scheduler;
-					
-                        // Can't switch to completed fibers
-                        if (yieldToFiberInstruction.Fiber.IsCompleted)
-                            throw new InvalidOperationException("An attempt was made to yield to a completed fiber.");
-						
-                        // Verify scheduler
-                        if (yieldToFiberInstruction.Fiber.Scheduler != FiberScheduler.Current)
-                            throw new InvalidOperationException("Currently only fibers belonging to the same scheduler may be yielded to. FiberScheduler.Current = "
-                            + (FiberScheduler.Current == null ? "null" : FiberScheduler.Current.ToString())
-                            + ", Fiber.Scheduler = " + (yieldToFiberInstruction.Fiber.Scheduler == null ? "null" : yieldToFiberInstruction.Fiber.Scheduler.ToString()));
-                    }
-						
-                    return instruction;
+                    if (result is StopInstruction)
+                        Stop (FiberStatus.RanToCompletion);
+                } else {
+                    // Func execution nulls out the function
+                    // so the scheduler will return to here
+                    // when complete and then stop.
+                    result = Stop (FiberStatus.RanToCompletion);
                 }
+
+                // Treat null as a special case
+                if (result == null)
+                    return FiberInstruction.YieldToAnyFiber;
+
+                // Return instructions or throw if invalid
+                var instruction = result as FiberInstruction;
+                if (instruction == null) {
+                    // If the result was an enumerator there is a nested coroutine to execute
+                    if (result is IEnumerator) {
+                        instruction = new YieldUntilComplete (Fiber.Factory.StartNew (result as IEnumerator, cancelToken, scheduler));
+                    } else if (result is Fiber) {
+                        // Convert fibers into yield instructions
+                        instruction = new YieldUntilComplete (result as Fiber);
+                    } else {
+                        // Pass through other values
+                        return new ObjectInstruction (result);
+                    }
+                }
+
+                if (instruction is FiberResult) {
+                    ResultAsObject = ((FiberResult)instruction).Result;
+                    result = Stop (FiberStatus.RanToCompletion);
+                }
+
+                // Verify same scheduler	
+                if (instruction is YieldUntilComplete && ((YieldUntilComplete)instruction).Fiber.Scheduler != FiberScheduler.Current)
+                    throw new InvalidOperationException ("Currently only fibers belonging to the same scheduler may be yielded to. FiberScheduler.Current = "
+                    + (FiberScheduler.Current == null ? "null" : FiberScheduler.Current.ToString ())
+                    + ", Fiber.Scheduler = " + (((YieldUntilComplete)instruction).Fiber.Scheduler == null ? "null" : ((YieldUntilComplete)instruction).Fiber.Scheduler.ToString ()));
+
+                var yieldToFiberInstruction = instruction as YieldToFiber;
+                if (yieldToFiberInstruction != null) {
+                    // Start fibers yielded to that aren't running yet
+                    Interlocked.CompareExchange (ref yieldToFiberInstruction.Fiber.status, (int)FiberStatus.WaitingToRun, (int)FiberStatus.Created);
+                    var originalState = (FiberStatus)Interlocked.CompareExchange (ref yieldToFiberInstruction.Fiber.status, (int)FiberStatus.Running, (int)FiberStatus.WaitingToRun);
+                    if (originalState == FiberStatus.WaitingToRun)
+                        yieldToFiberInstruction.Fiber.scheduler = scheduler;
+
+                    // Can't switch to completed fibers
+                    if (yieldToFiberInstruction.Fiber.IsCompleted)
+                        throw new InvalidOperationException ("An attempt was made to yield to a completed fiber.");
+
+                    // Verify scheduler
+                    if (yieldToFiberInstruction.Fiber.Scheduler != FiberScheduler.Current)
+                        throw new InvalidOperationException ("Currently only fibers belonging to the same scheduler may be yielded to. FiberScheduler.Current = "
+                        + (FiberScheduler.Current == null ? "null" : FiberScheduler.Current.ToString ())
+                        + ", Fiber.Scheduler = " + (yieldToFiberInstruction.Fiber.Scheduler == null ? "null" : yieldToFiberInstruction.Fiber.Scheduler.ToString ()));
+                }
+
+                //Console.WriteLine ("Fiber {0}:{1} returning {2}", Id, Status, instruction);
+                return instruction;
             } catch (System.Threading.OperationCanceledException cancelException) {
                 // Handle as proper cancellation only if the token matches.
                 // Otherwise treat it as a fault.
                 if (cancelException.CancellationToken == cancelToken) {
                     this.Exception = null;
-                    return Stop(FiberStatus.Canceled);
+                    return Stop (FiberStatus.Canceled);
                 } else {
                     this.Exception = cancelException;
-                    return Stop(FiberStatus.Faulted);
+                    return Stop (FiberStatus.Faulted);
                 }
             } catch (Exception fiberException) {
                 this.Exception = fiberException;
-                return Stop(FiberStatus.Faulted);
-            } finally {	
+                return Stop (FiberStatus.Faulted);
+            } finally {
                 // Pop the current fiber
                 Fiber.CurrentFiber = lastFiber;
+
+                //Console.WriteLine ("Fiber {0}:{1} end executing", Id, Status);
             }
         }
 
-        private StopInstruction Stop(FiberStatus finalStatus)
+        private StopInstruction Stop (FiberStatus finalStatus)
         {
             // Interlocked isn't necessary because we don't need
             // the initial value (stops are final). They are also
             // only called by the scheduler thread during Execute().
             status = (int)finalStatus;
-            FinishCompletion();
+            FinishCompletion ();
             return FiberInstruction.Stop;
         }
     }

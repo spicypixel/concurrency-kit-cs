@@ -51,13 +51,5 @@ namespace SpicyPixel.Threading
 		/// The fiber to queue.
 		/// </param>
 		void QueueFiber(Fiber fiber);
-		
-		/// <summary>
-		/// Invoked when an abort has been requested.
-		/// </summary>
-		/// <param name='fiber'>
-		/// The fiber to be aborted.
-		/// </param>
-		void AbortRequested(Fiber fiber);
 	}
 }

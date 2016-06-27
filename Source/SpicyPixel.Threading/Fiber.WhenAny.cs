@@ -100,7 +100,7 @@ namespace SpicyPixel.Threading
                     throw new ArgumentException ("fibers", "the fibers argument contains a null element");              
             }
 
-            return Fiber.Factory.StartNew(WhenAnyFibersCoroutine(fibers, millisecondsTimeout, cancellationToken), scheduler);
+            return Fiber.Factory.StartNew(WhenAnyFibersCoroutine(fibers, millisecondsTimeout, cancellationToken), cancellationToken, scheduler);
         }
             
         /// <summary>
@@ -230,7 +230,7 @@ namespace SpicyPixel.Threading
                     throw new ArgumentException ("tasks", "the tasks argument contains a null element");
             }
 
-            return Fiber.Factory.StartNew (WhenAnyTasksCoroutine (tasks, millisecondsTimeout, cancellationToken), scheduler);
+            return Fiber.Factory.StartNew (WhenAnyTasksCoroutine (tasks, millisecondsTimeout, cancellationToken), cancellationToken, scheduler);
         }
 
         /// <summary>

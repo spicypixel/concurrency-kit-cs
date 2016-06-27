@@ -39,7 +39,7 @@ namespace SpicyPixel.Threading.Test
     [TestFixture()]
     public class PrimaryTests
     {
-        [Test()]
+        [Test]
         public void TestWaitForTwoFibers()
         {
             var cancelSource = new CancellationTokenSource();
@@ -61,7 +61,7 @@ namespace SpicyPixel.Threading.Test
             Console.Out.WriteLine("Done waiting");
         }
 
-        [Test()]
+        [Test]
         public void TestRunWithFiberUsingTask()
         {						
             var task = Task.Factory.StartNew(() => {
@@ -73,7 +73,7 @@ namespace SpicyPixel.Threading.Test
             Console.Out.WriteLine("Done waiting");
         }
 
-        [Test()]
+        [Test]
         public void TestRunWithFiberUsingThread()
         {						
             var thread = new Thread(() => {
@@ -86,7 +86,7 @@ namespace SpicyPixel.Threading.Test
             Console.Out.WriteLine("Done waiting");
         }
 
-        [Test()]
+        [Test]
         public void TestFunc()
         {
             Fiber.Factory.StartNew(TestFiberLetters());
@@ -95,7 +95,7 @@ namespace SpicyPixel.Threading.Test
             FiberScheduler.Current.Run(mainFiber); 
         }
 
-        [Test()]
+        [Test]
         public void TestYieldForSeconds()
         {
             var start = DateTime.Now;
@@ -114,7 +114,7 @@ namespace SpicyPixel.Threading.Test
             yield return new YieldForSeconds(2);
         }
 
-        [Test()]
+        [Test]
         public void TestFuncTask()
         {
             var start = DateTime.Now;
@@ -137,7 +137,7 @@ namespace SpicyPixel.Threading.Test
                 yield return FiberInstruction.YieldToAnyFiber;
         }
 
-        [Test()]
+        [Test]
         public void TestInstructionInTask()
         {
             var start = DateTime.Now;
@@ -153,7 +153,7 @@ namespace SpicyPixel.Threading.Test
             Assert.LessOrEqual(end - start, TimeSpan.FromSeconds(3));
         }
 
-        [Test()]
+        [Test]
         public void TestCancellationToken()
         {
             var start = DateTime.Now;
@@ -176,7 +176,7 @@ namespace SpicyPixel.Threading.Test
 
         List<int> testNestingSteps = new List<int>();
 
-        [Test()]
+        [Test]
         public void TestNestedFibers()
         {
             testNestingSteps.Clear();
@@ -229,7 +229,7 @@ namespace SpicyPixel.Threading.Test
             testNestingSteps.Add(8);
         }
 
-        [Test()]
+        [Test]
         public void TestNestedCoroutines()
         {
             testNestingSteps.Clear();
@@ -241,7 +241,7 @@ namespace SpicyPixel.Threading.Test
             }
         }
 
-        [Test()]
+        [Test]
         public void TestNestedCoroutinesBasic()
         {
             FiberScheduler.Current.Run(new Fiber(Coroutine1()));
@@ -270,7 +270,7 @@ namespace SpicyPixel.Threading.Test
         bool coroutine1Completed = false;
         bool coroutine2Completed = false;
 
-        [Test()]
+        [Test]
         public void TestYieldToFiber()
         {
             using (var backgroundFiberScheduler = SystemFiberScheduler.StartNew()) {
@@ -356,7 +356,7 @@ namespace SpicyPixel.Threading.Test
 
         List<int> waitAllTokens = new List<int>();
 
-        [Test()]
+        [Test]
         public void TestWhenAll()
         {
             waitAllTokens.Clear();
@@ -377,16 +377,19 @@ namespace SpicyPixel.Threading.Test
         {
             foreach (var fiber in fibers)
                 Assert.IsFalse(fiber.IsCompleted, "Fiber was not running");
-
+            
             var waitAllFiber = Fiber.WhenAll(fibers);
             yield return waitAllFiber;
 
             foreach (var fiber in fibers)
                 Assert.IsTrue(fiber.IsCompleted, "Fiber was still running and should have been stopped");
 
+            Assert.IsNull (waitAllFiber.ResultAsObject, "Result should be null");
+            Assert.AreEqual (FiberStatus.RanToCompletion, waitAllFiber.Status, "Should have run to completion");
+
             // Result should be true
-            Assert.IsNotNull(waitAllFiber.ResultAsObject, "Result should not be null");
-            Assert.IsTrue((bool)waitAllFiber.ResultAsObject, "Result should have been true");
+            //Assert.IsNotNull(waitAllFiber.ResultAsObject, "Result should not be null");
+            //Assert.IsTrue((bool)waitAllFiber.ResultAsObject, "Result should have been true");
         }
 
         IEnumerator WaitRandomTimeCoroutine(int token)
@@ -395,7 +398,7 @@ namespace SpicyPixel.Threading.Test
             yield return new YieldForSeconds((float)(new Random().Next() % 30) / 10f);
         }
 
-        [Test()]
+        [Test]
         public void TestWhenAllTimeout()
         {
             var fibers = new Fiber[] {
@@ -425,12 +428,16 @@ namespace SpicyPixel.Threading.Test
             // Now none should be running
             Assert.IsFalse(fibers.Any(f => f.Status == FiberStatus.Running), "No fibers should have been running");
 
+            Assert.IsNull (waitAllFiber.ResultAsObject, "Result should be null");
+            Assert.AreEqual (FiberStatus.Faulted, waitAllFiber.Status, "Should have been faulted");
+            Assert.IsInstanceOf (typeof (TimeoutException), waitAllFiber.Exception, "Should have been TimeoutException");
+
             // Result should be false
-            Assert.IsNotNull(waitAllFiber.ResultAsObject, "Result should not be null");
-            Assert.IsFalse((bool)waitAllFiber.ResultAsObject, "Result should have been false");
+            //Assert.IsNotNull(waitAllFiber.ResultAsObject, "Result should not be null");
+            //Assert.IsFalse((bool)waitAllFiber.ResultAsObject, "Result should have been false");
         }
 
-        [Test()]
+        [Test]
         public void TestWhenAllCancellation()
         {
             var fibers = new Fiber[] {
@@ -463,12 +470,104 @@ namespace SpicyPixel.Threading.Test
             // Now none should be running
             Assert.IsFalse(fibers.Any(f => f.Status == FiberStatus.Running), "No fibers should have been running");
 
+            Assert.IsNull (waitAllFiber.ResultAsObject, "Result should be null");
+            Assert.AreEqual (FiberStatus.Canceled, waitAllFiber.Status, "Should be canceled");
+
             // Result should be false
-            Assert.IsNotNull(waitAllFiber.ResultAsObject, "Result should not be null");
-            Assert.IsFalse((bool)waitAllFiber.ResultAsObject, "Result should have been false");
+            //Assert.IsNotNull(waitAllFiber.ResultAsObject, "Result should not be null");
+            //Assert.IsFalse((bool)waitAllFiber.ResultAsObject, "Result should have been false");
         }
 
-        [Test()]
+        [Test]
+        public void TestWhenAllChildCancellation ()
+        {
+            var fibers = new Fiber [] {
+                Fiber.Factory.StartNew(() => new YieldForSeconds(0.5f)),
+                Fiber.Factory.StartNew(() => new YieldForSeconds(0.5f)),
+                Fiber.Factory.StartNew(() => { throw new System.Threading.OperationCanceledException (); }),
+                Fiber.Factory.StartNew(() => new YieldForSeconds(0.5f)),
+                Fiber.Factory.StartNew(() => new YieldForSeconds(0.5f)),
+                Fiber.Factory.StartNew(() => new YieldForSeconds(0.5f))
+            };
+
+            FiberScheduler.Current.Run (new Fiber (TestWhenAllChildCancellationCoroutine (fibers)));
+        }
+
+        IEnumerator TestWhenAllChildCancellationCoroutine (Fiber [] fibers)
+        {
+            // One fiber will cancel
+            var waitAllFiber = Fiber.WhenAll (fibers);
+            yield return waitAllFiber;
+
+            // None should be running
+            Assert.IsFalse (fibers.Any (f => f.Status == FiberStatus.Running), "No fibers should have been running");
+
+            // All should be complete
+            Assert.IsTrue (fibers.All (f => f.IsCompleted), "All should be complete");
+
+            // None should be faulted
+            Assert.IsFalse (fibers.Any (f => f.IsFaulted), "None should be faulted");
+
+            // One should be canceled
+            Assert.IsTrue (fibers.Count (f => f.IsCanceled) == 1, "One should be canceled");
+
+            // Result should not be present
+            Assert.IsNull (waitAllFiber.ResultAsObject, "Result should not be present");
+
+            // Fiber should not be faulted
+            Assert.IsFalse (waitAllFiber.IsFaulted, "Fiber should not be faulted");
+
+            // Fiber should be canceled
+            Assert.IsTrue (waitAllFiber.IsCanceled, "Fiber should have been canceled");
+        }
+
+        [Test]
+        public void TestWhenAllFaulted ()
+        {
+            var fibers = new Fiber [] {
+                Fiber.Factory.StartNew(() => new YieldForSeconds(0.5f)),
+                Fiber.Factory.StartNew(() => new YieldForSeconds(0.5f)),
+                Fiber.Factory.StartNew(() => { throw new Exception (); }),
+                Fiber.Factory.StartNew(() => new YieldForSeconds(0.5f)),
+                Fiber.Factory.StartNew(() => { throw new Exception (); }),
+                Fiber.Factory.StartNew(() => new YieldForSeconds(0.5f))
+            };
+
+            FiberScheduler.Current.Run (new Fiber (TestWhenAllFaultedCoroutine (fibers)));
+        }
+
+        IEnumerator TestWhenAllFaultedCoroutine (Fiber [] fibers)
+        {
+            // One fiber will cancel
+            var waitAllFiber = Fiber.WhenAll (fibers);
+            yield return waitAllFiber;
+
+            // None should be running
+            Assert.IsFalse (fibers.Any (f => f.Status == FiberStatus.Running), "No fibers should have been running");
+
+            // All should be complete
+            Assert.IsTrue (fibers.All (f => f.IsCompleted), "All should be complete");
+
+            // 2 should be faulted
+            Assert.AreEqual (2, fibers.Count (f => f.IsFaulted), "2 should be faulted");
+
+            // None should be canceled
+            Assert.IsFalse (fibers.Any (f => f.IsCanceled), "None should be canceled");
+
+            // Result should not be present
+            Assert.IsNull (waitAllFiber.ResultAsObject, "Result should not be present");
+
+            // Fiber should be faulted
+            Assert.IsTrue (waitAllFiber.IsFaulted, "Fiber should have been faulted");
+
+            // Fiber should have exception
+            Assert.IsNotNull (waitAllFiber.Exception, "Fiber should have exception");
+
+            // Exception should have 2 inner exceptions
+            Assert.AreEqual (2, (waitAllFiber.Exception as AggregateException).InnerExceptions.Count, "Fiber should have 2 inner exceptions");
+        }
+
+        [Test]
         public void TestWhenAny()
         {
             var fibers = new Fiber[] {
@@ -503,7 +602,7 @@ namespace SpicyPixel.Threading.Test
             Assert.IsTrue(fibers.All(f => f.IsCompleted), "No fibers should have been running");
         }
 
-        [Test()]
+        [Test]
         public void TestDelay()
         {
             var startTime = DateTime.Now;

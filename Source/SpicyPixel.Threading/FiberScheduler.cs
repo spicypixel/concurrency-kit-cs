@@ -194,12 +194,6 @@ namespace SpicyPixel.Threading
 			this.QueueFiber(fiber);
 		}
 		
-		// Used by Fiber to invoke the protected methods
-		void IFiberScheduler.AbortRequested(Fiber fiber)
-		{
-			this.AbortRequested(fiber);
-		}
-		
 		/// <summary>
 		/// Run the blocking scheduler loop and perform the specified number of updates per second.
 		/// </summary>
@@ -280,21 +274,7 @@ namespace SpicyPixel.Threading
 		/// The fiber to queue.
 		/// </param>
 		protected abstract void QueueFiber(Fiber fiber);
-		
-		/// <summary>
-		/// Invoked when an abort has been requested.
-		/// </summary>
-		/// <remarks>
-		/// This call will only arrive from another thread and it's possible
-		/// the scheduler may have already dealt with the abort because the
-		/// state was already changed to AbortRequested before this method
-		/// is fired. Schedulers must handle that condition.
-		/// </remarks>
-		/// <param name='fiber'>
-		/// The fiber to be aborted.
-		/// </param>
-		protected abstract void AbortRequested(Fiber fiber);
-		
+				
 		/// <summary>
 		/// Executes the fiber until it ends or yields.
 		/// </summary>

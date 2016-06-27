@@ -107,21 +107,6 @@ namespace SpicyPixel.Threading
         }
 
         /// <summary>
-        /// Invoked when an abort has been requested. 
-        /// </summary>
-        /// <remarks>
-        /// Unity is always running scheduled fibers and so there is nothing
-        /// special to do here to get it to attempt to execute the fiber again
-        /// (which will trigger the abort).
-        /// </remarks>
-        /// <param name='fiber'>
-        /// The fiber to be aborted. 
-        /// </param>
-        protected override void AbortRequested(Fiber fiber)
-        {
-        }
-
-        /// <summary>
         /// Runs on the scheduler thread and dispatches all queued fibers.
         /// </summary>
         /// <returns>
