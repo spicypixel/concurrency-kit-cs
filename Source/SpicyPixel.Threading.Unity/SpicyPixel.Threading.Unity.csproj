@@ -32,13 +32,13 @@
     <DocumentationFile>bin\Release\SpicyPixel.Threading.Unity.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
-    <UnityEnginePath Condition="$(UnityEnginePath) == ''">/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEngine.dll</UnityEnginePath>
+    <UnityEnginePath Condition="$(UnityEnginePath) == ''">/Applications/Unity/Unity.app/Contents/Managed/UnityEngine.dll</UnityEnginePath>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral">
       <HintPath>$(UnityEnginePath)</HintPath>
-      <Package>/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEngine.dll</Package>
+      <Package>/Applications/Unity/Unity.app/Contents/Managed/UnityEngine.dll</Package>
     </Reference>
   </ItemGroup>
   <ItemGroup>
