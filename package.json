@@ -4,8 +4,8 @@
   "description": "Spicy Pixel Concurrency Kit C#",
   "main": "gulpfile.js",
   "scripts": {
-    "prepublish": "gulp rebuild",
-    "postinstall": "gulp build"
+    "prepublishOnly": "gulp rebuild",
+    "install": "gulp build"
   },
   "repository": {
     "type": "git",
@@ -14,9 +14,9 @@
   "author": "Spicy Pixel, Inc.",
   "license": "MIT",
   "dependencies": {
-    "@spicypixel/build-kit-js": "*",
-    "@spicypixel/core-kit-js": "*",
-    "@spicypixel/unity-kit-js": "*",
+    "@spicypixel/build-kit-js": "^0.0.49",
+    "@spicypixel/core-kit-js": "^0.0.43",
+    "@spicypixel/unity-kit-js": "^0.0.24",
     "gulp": "^3.9.1"
   }
 }
