@@ -1,10 +1,4 @@
-cache:
-  paths:
-    - node_modules/
-
 build:
   script:
-    - npm prune
-    - npm update --depth Infinity
-    - npm install
+    - yarn install
     - node node_modules/.bin/gulp test
