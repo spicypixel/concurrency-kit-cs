@@ -1,8 +1,10 @@
 import * as gulp from "gulp";
-
-import * as FileSystem from "@spicypixel/core-kit-js/lib/file-system";
-import UnityEditor from "@spicypixel/unity-kit-js/lib/unity-editor";
 import * as BuildKit from "@spicypixel/build-kit-js";
+import * as UnityKit from "@spicypixel/unity-kit-js";
+import * as CoreKit from "@spicypixel/core-kit-js";
+import FileSystem = CoreKit.FileSystem;
+
+const monoDocBuilder = new BuildKit.MonoDocBuilder();
 
 gulp.task("default", () => build());
 gulp.task("clean", () => clean());
@@ -13,13 +15,12 @@ gulp.task("build", () => build());
 gulp.task("test", () => test());
 gulp.task("install:monodocs", () => installMonoDocs());
 
-let monoDocBuilder = new BuildKit.MonoDocBuilder();
-
 async function clean() {
   await FileSystem.removePatternsAsync([
     "Source/**/bin/*", "Source/**/obj/*",
     "Doxygen/html", "Doxygen/xml", "Doxygen/qt",
-    "MonoDoc/xml", "MonoDoc/assemble", "MonoDoc/html"]);
+    "MonoDoc/xml", "MonoDoc/assemble", "MonoDoc/html",
+    "Source/packages/*/"]);
 }
 
 async function rebuild() {
@@ -35,12 +36,9 @@ async function build() {
 async function buildCode() {
   await BuildKit.MSBuildBuilder.buildAsync({
     properties: {
-      UnityEnginePath: UnityEditor.enginePath
+      UnityEnginePath: UnityKit.UnityEditor.enginePath
     },
-    toolsVersion: 12.0,
     targets: ["Build"],
-    errorOnFail: true,
-    stdout: true
   });
 }
 
@@ -51,11 +49,12 @@ async function installMonoDocs() {
 async function buildDocs() {
   await BuildKit.DoxygenBuilder.buildAsync();
 
-  let assemblies = [
+  await monoDocBuilder.buildAsync("SpicyPixel.ConcurrencyKit",
+  [
     "System.Threading",
     "SpicyPixel.Threading",
-    "SpicyPixel.Threading.Unity"];
-  await monoDocBuilder.buildAsync("SpicyPixel.ConcurrencyKit", assemblies);
+    "SpicyPixel.Threading.Unity"
+  ]);
 }
 
 async function test() {

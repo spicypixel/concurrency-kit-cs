@@ -7,6 +7,24 @@
     "prepublishOnly": "gulp rebuild",
     "install": "gulp build"
   },
+  "files": [
+    "Docs/",
+    "Doxygen/fonts",
+    "Doxygen/theme",
+    "Doxygen/logo.png",
+    "Licenses/",
+    "MonoDoc/*.source",
+    "Source/**/*.config",
+    "Source/**/*.sln",
+    "Source/**/*.csproj",
+    "Source/**/*.cs",
+    "Doxyfile",
+    "gulpfile.js",
+    "gulpfile.ts",
+    "!Source/packages/*/",
+    "!**/bin/",
+    "!**/obj/"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/spicypixel/concurrency-kit-cs.git"
@@ -14,9 +32,9 @@
   "author": "Spicy Pixel, Inc.",
   "license": "MIT",
   "dependencies": {
-    "@spicypixel/build-kit-js": "^0.0.49",
-    "@spicypixel/core-kit-js": "^0.0.43",
-    "@spicypixel/unity-kit-js": "^0.0.24",
+    "@spicypixel/build-kit-js": "^0.0.65",
+    "@spicypixel/core-kit-js": "^0.0.57",
+    "@spicypixel/unity-kit-js": "^0.0.59",
     "gulp": "^3.9.1"
   }
 }
