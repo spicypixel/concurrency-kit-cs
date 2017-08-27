@@ -21,7 +21,7 @@
 
 "@spicypixel/build-kit-js@^0.0.65":
   version "0.0.65"
-  resolved "http://npm.darkavalon.homeip.net/@spicypixel%2fbuild-kit-js/-/build-kit-js-0.0.65.tgz#34afeeed6ea64b304c26e811f6318d5885df9dec"
+  resolved "https://registry.npmjs.org/@spicypixel/build-kit-js/-/build-kit-js-0.0.65.tgz#34afeeed6ea64b304c26e811f6318d5885df9dec"
   dependencies:
     "@types/bluebird" "^3.5.8"
     "@types/chai" "^4.0.4"
@@ -65,7 +65,7 @@
 
 "@spicypixel/core-kit-js@^0.0.57":
   version "0.0.57"
-  resolved "http://npm.darkavalon.homeip.net/@spicypixel%2fcore-kit-js/-/core-kit-js-0.0.57.tgz#6cac3790b5207298ea2fb0f90cecd5c24df4ddb6"
+  resolved "https://registry.npmjs.org/@spicypixel/core-kit-js/-/core-kit-js-0.0.57.tgz#6cac3790b5207298ea2fb0f90cecd5c24df4ddb6"
   dependencies:
     "@spicypixel/build-kit-js" "^0.0.65"
     "@types/glob" "^5.0.32"
@@ -86,7 +86,7 @@
 
 "@spicypixel/unity-kit-js@^0.0.60":
   version "0.0.60"
-  resolved "http://npm.darkavalon.homeip.net/@spicypixel%2funity-kit-js/-/unity-kit-js-0.0.60.tgz#a857ccaa54696217b9df5bc56e3ce32a4f1ed629"
+  resolved "https://registry.npmjs.org/@spicypixel/unity-kit-js/-/unity-kit-js-0.0.60.tgz#a857ccaa54696217b9df5bc56e3ce32a4f1ed629"
   dependencies:
     "@spicypixel/build-kit-js" "^0.0.65"
     "@spicypixel/core-kit-js" "^0.0.57"
@@ -1638,7 +1638,7 @@ gulp-util@>=3.0.0, gulp-util@^3.0.0, gulp-util@^3.0.7, gulp-util@^3.0.8, gulp-ut
 
 gulp@^3.9.1:
   version "3.9.1"
-  resolved "http://npm.darkavalon.homeip.net/gulp/-/gulp-3.9.1.tgz#571ce45928dd40af6514fc4011866016c13845b4"
+  resolved "https://registry.npmjs.org/gulp/-/gulp-3.9.1.tgz#571ce45928dd40af6514fc4011866016c13845b4"
   dependencies:
     archy "^1.0.0"
     chalk "^1.0.0"
