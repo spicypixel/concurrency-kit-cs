@@ -1,4 +1,4 @@
-// 
+﻿// 
 // ConcurrentExclusiveSchedulerPair.cs
 //
 // Authors:
@@ -28,7 +28,7 @@
 //
 //
 
-#if NET_4_5
+#if NET_4_5 || UNITY_5_3_OR_NEWER
 
 using System;
 using System.Threading;

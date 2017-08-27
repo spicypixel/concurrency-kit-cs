@@ -1,4 +1,4 @@
-//
+﻿//
 // Task_T.cs
 //
 // Authors:
@@ -27,7 +27,7 @@
 //
 //
 
-#if NET_4_0
+#if NET_4_0 || UNITY_5_3_OR_NEWER
 
 using System.Runtime.CompilerServices;
 
@@ -230,7 +230,7 @@ namespace System.Threading.Tasks
 			return true;
 		}
 
-#if NET_4_5
+#if NET_4_5 || UNITY_5_3_OR_NEWER
 		public
 #else
 		internal
@@ -255,7 +255,7 @@ namespace System.Threading.Tasks
 			return t;
 		}
 		
-#if NET_4_5
+#if NET_4_5 || UNITY_5_3_OR_NEWER
 
 		public Task ContinueWith (Action<Task<TResult>, object> continuationAction, object state)
 		{

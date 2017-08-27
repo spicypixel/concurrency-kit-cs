@@ -1,4 +1,4 @@
-//
+﻿//
 // System.Func.cs
 //
 // Authors:
@@ -28,42 +28,42 @@
 using System.Runtime.CompilerServices;
 
 namespace System {
-	
-#if NET_4_0
+
+#if NET_4_0 || UNITY_5_3_OR_NEWER
 
 #if false // Spicy Pixel: The other definitions already exist in NET_3_5
 
 #if MOBILE
 	[TypeForwardedFrom (Consts.AssemblySystem_Core)]
-#elif NET_4_0
+#elif NET_4_0 || UNITY_5_3_OR_NEWER
 	[TypeForwardedFrom (Consts.AssemblySystemCore_3_5)]
 #endif
 	public delegate TResult Func<out TResult> ();
 	
 #if MOBILE
 	[TypeForwardedFrom (Consts.AssemblySystem_Core)]
-#elif NET_4_0
+#elif NET_4_0 || UNITY_5_3_OR_NEWER
 	[TypeForwardedFrom (Consts.AssemblySystemCore_3_5)]
 #endif
 	public delegate TResult Func<in T, out TResult> (T arg);
 	
 #if MOBILE
 	[TypeForwardedFrom (Consts.AssemblySystem_Core)]
-#elif NET_4_0
+#elif NET_4_0 || UNITY_5_3_OR_NEWER
 	[TypeForwardedFrom (Consts.AssemblySystemCore_3_5)]
 #endif
 	public delegate TResult Func<in T1, in T2, out TResult> (T1 arg1, T2 arg2);
 	
 #if MOBILE
 	[TypeForwardedFrom (Consts.AssemblySystem_Core)]
-#elif NET_4_0
+#elif NET_4_0 || UNITY_5_3_OR_NEWER
 	[TypeForwardedFrom (Consts.AssemblySystemCore_3_5)]
 #endif
 	public delegate TResult Func<in T1, in T2, in T3, out TResult> (T1 arg1, T2 arg2, T3 arg3);
 	
 #if MOBILE
 	[TypeForwardedFrom (Consts.AssemblySystem_Core)]
-#elif NET_4_0
+#elif NET_4_0 || UNITY_5_3_OR_NEWER
 	[TypeForwardedFrom (Consts.AssemblySystemCore_3_5)]
 #endif
 	public delegate TResult Func<in T1, in T2, in T3, in T4, out TResult> (T1 arg1, T2 arg2, T3 arg3, T4 arg4);

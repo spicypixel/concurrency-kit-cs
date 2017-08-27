@@ -1,4 +1,4 @@
-//
+﻿//
 // ICriticalNotifyCompletion.cs
 //
 // Authors:
@@ -26,7 +26,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#if NET_4_5
+#if NET_4_5 || UNITY_5_3_OR_NEWER
 
 namespace System.Runtime.CompilerServices
 {

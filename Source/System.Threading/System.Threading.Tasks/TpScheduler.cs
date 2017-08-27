@@ -1,4 +1,4 @@
-//
+﻿//
 // TpScheduler.cs
 //
 // Authors:
@@ -29,7 +29,7 @@
 //
 //
 
-#if NET_4_0
+#if NET_4_0 || UNITY_5_3_OR_NEWER
 
 using System.Collections.Generic;
 

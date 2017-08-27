@@ -1,4 +1,4 @@
-// SplitOrderedList.cs
+﻿// SplitOrderedList.cs
 //
 // Copyright (c) 2010 Jérémie "Garuma" Laval
 //
@@ -22,7 +22,7 @@
 //
 //
 
-#if NET_4_0 || INSIDE_SYSTEM_WEB
+#if NET_4_0 || UNITY_5_3_OR_NEWER || INSIDE_SYSTEM_WEB
 
 using System;
 using System.Threading;

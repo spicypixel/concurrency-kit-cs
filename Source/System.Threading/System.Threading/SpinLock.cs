@@ -1,4 +1,4 @@
-// SpinLock.cs
+﻿// SpinLock.cs
 //
 // Copyright (c) 2008 Jérémie "Garuma" Laval
 // Copyright 2011 Xamarin Inc (http://www.xamarin.com).
@@ -23,7 +23,7 @@
 //
 //
 
-#if NET_4_0
+#if NET_4_0 || UNITY_5_3_OR_NEWER
 
 using System;
 using System.Collections.Concurrent;

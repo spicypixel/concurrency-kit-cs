@@ -1,4 +1,4 @@
-//
+﻿//
 // TaskExceptionSlot.cs
 //
 // Authors:
@@ -28,7 +28,7 @@
 //
 //
 
-#if NET_4_0
+#if NET_4_0 || UNITY_5_3_OR_NEWER
 
 using System;
 using System.Collections.Concurrent;
@@ -56,7 +56,7 @@ namespace System.Threading.Tasks
 				//
 				// .NET allows to configure this using config element ThrowUnobservedTaskExceptions
 				//
-#if !NET_4_5
+#if !NET_4_5 && !UNITY_5_3_OR_NEWER
 				throw Exception;
 #endif
 			}

@@ -1,4 +1,4 @@
-//
+﻿//
 // System.OperationCanceledException.cs
 //
 // Authors:
@@ -37,7 +37,7 @@ namespace System.Threading
 	[ComVisible (true)]
 	public class OperationCanceledException : System.OperationCanceledException
 	{
-#if NET_4_0 || MOBILE
+#if NET_4_0 || UNITY_5_3_OR_NEWER || MOBILE
 		CancellationToken? token;
 #endif
 
@@ -62,7 +62,7 @@ namespace System.Threading
 		{
 		}
 		
-#if NET_4_0 || MOBILE
+#if NET_4_0 || UNITY_5_3_OR_NEWER || MOBILE
 		public OperationCanceledException (CancellationToken token)
 			: this ()
 		{

@@ -1,4 +1,4 @@
-// 
+﻿// 
 // CancellationTokenSource.cs
 //  
 // Authors:
@@ -26,13 +26,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#if NET_4_0
+#if NET_4_0 || UNITY_5_3_OR_NEWER
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 
 namespace System.Threading
 {
-#if !NET_4_5
+#if !NET_4_5 && !UNITY_5_3_OR_NEWER
 	sealed
 #endif
 	public class CancellationTokenSource : IDisposable
@@ -49,7 +49,7 @@ namespace System.Threading
 		internal static readonly CancellationTokenSource NoneSource = new CancellationTokenSource ();
 		internal static readonly CancellationTokenSource CanceledSource = new CancellationTokenSource ();
 		
-#if NET_4_5
+#if NET_4_5 || UNITY_5_3_OR_NEWER
 		static readonly TimerCallback timer_callback;
 		Timer timer;
 #endif
@@ -58,7 +58,7 @@ namespace System.Threading
 		{
 			CanceledSource.canceled = true;
 
-#if NET_4_5
+#if NET_4_5 || UNITY_5_3_OR_NEWER
 			timer_callback = token => {
 				var cts = (CancellationTokenSource) token;
 				cts.Cancel ();
@@ -89,7 +89,7 @@ namespace System.Threading
 			handle = new ManualResetEvent (false);
 		}
 
-#if NET_4_5
+#if NET_4_5 || UNITY_5_3_OR_NEWER
 		public CancellationTokenSource (int millisecondsDelay)
 			: this ()
 		{
@@ -188,7 +188,7 @@ namespace System.Threading
 			} catch (ObjectDisposedException) {}
 		}
 
-#if NET_4_5
+#if NET_4_5 || UNITY_5_3_OR_NEWER
 		public void CancelAfter (TimeSpan delay)
 		{
 			CancelAfter (CheckTimeout (delay));
@@ -261,7 +261,7 @@ namespace System.Threading
 			Dispose (true);
 		}
 
-#if NET_4_5
+#if NET_4_5 || UNITY_5_3_OR_NEWER
 		protected virtual
 #endif
 		void Dispose (bool disposing)
@@ -275,7 +275,7 @@ namespace System.Threading
 					UnregisterLinkedTokens ();
 					callbacks = null;
 				}
-#if NET_4_5
+#if NET_4_5 || UNITY_5_3_OR_NEWER
 				if (timer != null)
 					timer.Dispose ();
 #endif

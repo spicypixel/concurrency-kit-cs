@@ -1,4 +1,4 @@
-// AggregateException.cs
+﻿// AggregateException.cs
 //
 // Copyright (c) 2008 Jérémie "Garuma" Laval
 //
@@ -22,7 +22,7 @@
 //
 //
 
-#if NET_4_0
+#if NET_4_0 || UNITY_5_3_OR_NEWER
 using System;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;

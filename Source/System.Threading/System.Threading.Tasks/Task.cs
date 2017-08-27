@@ -1,4 +1,4 @@
-//
+﻿//
 // Task.cs
 //
 // Authors:
@@ -28,7 +28,7 @@
 //
 //
 
-#if NET_4_0
+#if NET_4_0 || UNITY_5_3_OR_NEWER
 
 using System;
 using System.Threading;
@@ -47,7 +47,7 @@ namespace System.Threading.Tasks
 		[System.ThreadStatic]
 		static Task current;
 		[System.ThreadStatic]
-		static Action<Task> childWorkAdder;
+		static Action<Task> childWorkAdder = null;
 		
 		// parent is the outer task in which this task is created
 		readonly Task parent;
@@ -80,7 +80,7 @@ namespace System.Threading.Tasks
 		internal const TaskCreationOptions WorkerTaskNotSupportedOptions = TaskCreationOptions.LongRunning | TaskCreationOptions.PreferFairness;
 
 		const TaskCreationOptions MaxTaskCreationOptions =
-#if NET_4_5
+#if NET_4_5 || UNITY_5_3_OR_NEWER
 			TaskCreationOptions.DenyChildAttach | TaskCreationOptions.HideScheduler |
 #endif
 			TaskCreationOptions.PreferFairness | TaskCreationOptions.LongRunning | TaskCreationOptions.AttachedToParent;
@@ -161,7 +161,7 @@ namespace System.Threading.Tasks
 			this.status          = cancellationToken.IsCancellationRequested && !ignoreCancellation ? TaskStatus.Canceled : TaskStatus.Created;
 
 			// Process creationOptions
-#if NET_4_5
+#if NET_4_5 || UNITY_5_3_OR_NEWER
 			if (parent != null && HasFlag (creationOptions, TaskCreationOptions.AttachedToParent)
 			    && !HasFlag (parent.CreationOptions, TaskCreationOptions.DenyChildAttach))
 #else
@@ -277,7 +277,7 @@ namespace System.Threading.Tasks
 		internal Task ContinueWith (TaskActionInvoker invoker, CancellationToken cancellationToken, TaskContinuationOptions continuationOptions, TaskScheduler scheduler)
 		{
 			var lazyCancellation = false;
-#if NET_4_5
+#if NET_4_5 || UNITY_5_3_OR_NEWER
 			lazyCancellation = (continuationOptions & TaskContinuationOptions.LazyCancellation) > 0;
 #endif
 			var continuation = new Task (invoker, null, cancellationToken, GetCreationOptions (continuationOptions), null, this, lazyCancellation);
@@ -320,7 +320,7 @@ namespace System.Threading.Tasks
 		internal Task<TResult> ContinueWith<TResult> (TaskActionInvoker invoker, CancellationToken cancellationToken, TaskContinuationOptions continuationOptions, TaskScheduler scheduler)
 		{
 			var lazyCancellation = false;
-#if NET_4_5
+#if NET_4_5 || UNITY_5_3_OR_NEWER
 			lazyCancellation = (continuationOptions & TaskContinuationOptions.LazyCancellation) > 0;
 #endif
 			var continuation = new Task<TResult> (invoker, null, cancellationToken, GetCreationOptions (continuationOptions), parent, this, lazyCancellation);
@@ -416,7 +416,7 @@ namespace System.Threading.Tasks
 			var saveScheduler = TaskScheduler.Current;
 
 			current = this;
-#if NET_4_5
+#if NET_4_5 || UNITY_5_3_OR_NEWER
 			TaskScheduler.Current = HasFlag (creationOptions, TaskCreationOptions.HideScheduler) ? TaskScheduler.Default : scheduler;
 #else
 			TaskScheduler.Current = scheduler;
@@ -515,7 +515,7 @@ namespace System.Threading.Tasks
 				Status = exSlot == null ? TaskStatus.RanToCompletion : TaskStatus.Faulted;
 				ProcessCompleteDelegates ();
 				if (parent != null &&
-#if NET_4_5
+#if NET_4_5 || UNITY_5_3_OR_NEWER
 				    !HasFlag (parent.CreationOptions, TaskCreationOptions.DenyChildAttach) &&
 #endif
 					HasFlag (creationOptions, TaskCreationOptions.AttachedToParent))
@@ -550,7 +550,7 @@ namespace System.Threading.Tasks
 
 			// Tell parent that we are finished
 			if (parent != null && HasFlag (creationOptions, TaskCreationOptions.AttachedToParent) &&
-#if NET_4_5
+#if NET_4_5 || UNITY_5_3_OR_NEWER
 			    !HasFlag (parent.CreationOptions, TaskCreationOptions.DenyChildAttach) &&
 #endif
 				status != TaskStatus.WaitingForChildrenToComplete) {
@@ -852,7 +852,7 @@ namespace System.Threading.Tasks
 		}
 		#endregion
 
-#if NET_4_5
+#if NET_4_5 || UNITY_5_3_OR_NEWER
 		public
 #else
 		internal
@@ -875,7 +875,7 @@ namespace System.Threading.Tasks
 			return continuation;
 		}
 		
-#if NET_4_5
+#if NET_4_5 || UNITY_5_3_OR_NEWER
 
 		public ConfiguredTaskAwaitable ConfigureAwait (bool continueOnCapturedContext)
 		{

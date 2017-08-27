@@ -1,4 +1,4 @@
-// 
+﻿// 
 // OrderablePartitioner.cs
 //  
 // Author:
@@ -24,7 +24,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#if NET_4_0
+#if NET_4_0 || UNITY_5_3_OR_NEWER
 
 using System;
 using System.Collections.Generic;

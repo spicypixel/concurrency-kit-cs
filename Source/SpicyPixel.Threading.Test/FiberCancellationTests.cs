@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using NUnit.Framework;
 using System.Threading;
 using System.Collections;
@@ -14,13 +14,13 @@ namespace SpicyPixel.Threading.Test
         {            
         }
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void Init()
         {
             scheduler = SystemFiberScheduler.StartNew();
         }
 
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public void Dispose()
         {
             scheduler.Dispose();
