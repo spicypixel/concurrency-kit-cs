@@ -34,7 +34,8 @@ async function build() {
 }
 
 async function buildCode() {
-  await BuildKit.MSBuildBuilder.buildAsync({
+  await BuildKit.MSBuildBuilder.restoreAsync("Source");
+  await BuildKit.MSBuildBuilder.buildAsync("Source/*.sln", {
     properties: {
       UnityEnginePath: UnityKit.UnityEditor.enginePath
     },

@@ -9,6 +9,7 @@ Doxygen/xml
 Source/*/bin
 Source/*/obj
 Source/*/test-results
+Source/packages/*/
 node_modules
 TestResult.xml
 MonoDoc/assemble
