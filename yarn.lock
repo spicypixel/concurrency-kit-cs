@@ -84,9 +84,9 @@
     typescript "^2.4.2"
     walk "^2.3.9"
 
-"@spicypixel/unity-kit-js@^0.0.59":
-  version "0.0.59"
-  resolved "http://npm.darkavalon.homeip.net/@spicypixel%2funity-kit-js/-/unity-kit-js-0.0.59.tgz#f1cf63d9d9dc89b7e51111639f6f683c0f3d991a"
+"@spicypixel/unity-kit-js@^0.0.60":
+  version "0.0.60"
+  resolved "http://npm.darkavalon.homeip.net/@spicypixel%2funity-kit-js/-/unity-kit-js-0.0.60.tgz#a857ccaa54696217b9df5bc56e3ce32a4f1ed629"
   dependencies:
     "@spicypixel/build-kit-js" "^0.0.65"
     "@spicypixel/core-kit-js" "^0.0.57"

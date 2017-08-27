@@ -34,7 +34,7 @@
   "dependencies": {
     "@spicypixel/build-kit-js": "^0.0.65",
     "@spicypixel/core-kit-js": "^0.0.57",
-    "@spicypixel/unity-kit-js": "^0.0.59",
+    "@spicypixel/unity-kit-js": "^0.0.60",
     "gulp": "^3.9.1"
   }
 }
