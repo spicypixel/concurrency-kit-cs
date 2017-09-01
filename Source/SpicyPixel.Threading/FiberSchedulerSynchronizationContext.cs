@@ -37,7 +37,7 @@ namespace SpicyPixel.Threading
 	public class FiberSchedulerSynchronizationContext : SynchronizationContext
 	{
 		FiberScheduler scheduler;
-		
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="SpicyPixel.Threading.FiberSchedulerSynchronizationContext"/> class.
 		/// </summary>
@@ -48,7 +48,7 @@ namespace SpicyPixel.Threading
 		{
 			this.scheduler = scheduler;
 		}
-		
+
 		/// <summary>
 		/// Dispatches an asynchronous message to a synchronization context (the <see cref="FiberScheduler"/>).
 		/// </summary>
@@ -75,9 +75,9 @@ namespace SpicyPixel.Threading
 		/// Dispatches an synchronous message to a synchronization context (the <see cref="FiberScheduler"/>).
 		/// </summary>
 		/// <remarks>
-		/// The callback is always inlined if Send is executed from the 
+		/// The callback is always inlined if Send is executed from the
 		/// scheduler thread regardless of any scheduler specific inline settings.
-		/// Because inlining always occurs when on the scheduler thread, the 
+		/// Because inlining always occurs when on the scheduler thread, the
 		/// caller must manage stack depth.
 		/// </remarks>
 		/// <param name='d'>
@@ -94,20 +94,24 @@ namespace SpicyPixel.Threading
 				d(state);
 				return;
 			}
-			
+
 			// FIXME: This could block indefinitely if the scheduler goes down
 			// before executing the task. Need another wait handle here or
 			// better approach. Maybe add a WaitHandle to the fiber itself or
             // add Join().
-			
+
 			// The threads don't match, so queue the action
 			// and wait for it to complete.
 			ManualResetEvent wait = new ManualResetEvent(false);
-			Fiber.Factory.StartNew(() => {
-				d(state);
-				wait.Set();
-			}, scheduler);
+            var fiber = Fiber.Factory.StartNew (() => {
+                try {
+                    d (state);
+                } finally {
+                    wait.Set ();
+                }
+            }, scheduler);
 			wait.WaitOne();
+            fiber.ThrowIfCanceledOrFaulted ();
 		}
 	}
 }
